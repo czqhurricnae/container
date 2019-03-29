@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ueditor</title>
+    <script src="{{url_for('static',filename='ueditor/ueditor.config.js')}}"></script>
+    <script src="{{url_for('static',filename='ueditor/ueditor.all.min.js')}}"></script>
+    <script src="{{url_for('static',filename='ueditor/lang/ZH-cn/zh-cn.js')}}"></script>
+</head>
+<body>
+<script id="editor" type="text/plain"></script>
+<script type="text/javascript">
+    var ue=UE.getEditor('editor',{
+    serverUrl:'/upload/'
+    }
+    );
+</script>
+</body>
+</html>

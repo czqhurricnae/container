@@ -1,0 +1,127 @@
+# Translations template for PROJECT.
+# Copyright (C) 2016 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2016-09-08 22:22+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: aliyun.py:349
+msgid "File required."
+msgstr ""
+
+#: aliyun.py:354
+msgid "Invalid file type."
+msgstr ""
+
+#: aliyun.py:387
+#, python-format
+msgid "File \"%(name)s\" already exists."
+msgstr ""
+
+#: aliyun.py:440
+msgid "File uploading is disabled."
+msgstr ""
+
+#: aliyun.py:444 aliyun.py:485 aliyun.py:558 aliyun.py:606 aliyun.py:653
+msgid "Permission denied."
+msgstr ""
+
+#: aliyun.py:451
+#, python-format
+msgid "Successfully saved file: %(name)s"
+msgstr ""
+
+#: aliyun.py:455
+#, python-format
+msgid "Failed to save file: %(error)s"
+msgstr ""
+
+#: aliyun.py:463
+msgid "Upload File"
+msgstr ""
+
+#: aliyun.py:554
+msgid "Directory creation is disabled."
+msgstr ""
+
+#: aliyun.py:569
+#, python-format
+msgid "Successfully created directory: %(directory)s"
+msgstr ""
+
+#: aliyun.py:573
+#, python-format
+msgid "Failed to create directory: %(error)s"
+msgstr ""
+
+#: aliyun.py:583
+msgid "Create Directory"
+msgstr ""
+
+#: aliyun.py:602
+msgid "Deletion is disabled."
+msgstr ""
+
+#: aliyun.py:611
+msgid "Directory deletion is disabled."
+msgstr ""
+
+#: aliyun.py:617
+#, python-format
+msgid "Directory \"%(path)s\" was successfully deleted."
+msgstr ""
+
+#: aliyun.py:619
+#, python-format
+msgid "Failed to delete directory: %(error)s"
+msgstr ""
+
+#: aliyun.py:625 aliyun.py:708
+#, python-format
+msgid "File \"%(name)s\" was successfully deleted."
+msgstr ""
+
+#: aliyun.py:627 aliyun.py:710
+#, python-format
+msgid "Failed to delete file: %(name)s"
+msgstr ""
+
+#: aliyun.py:649
+msgid "Renaming is disabled."
+msgstr ""
+
+#: aliyun.py:657
+msgid "Path does not exist."
+msgstr ""
+
+#: aliyun.py:669
+#, python-format
+msgid "Successfully renamed \"%(src)s\" to \"%(dst)s\""
+msgstr ""
+
+#: aliyun.py:672
+#, python-format
+msgid "Failed to rename: %(error)s"
+msgstr ""
+
+#: aliyun.py:686
+#, python-format
+msgid "Rename %(name)s"
+msgstr ""
+
+#: aliyun.py:698
+msgid "File deletion is disabled."
+msgstr ""
+

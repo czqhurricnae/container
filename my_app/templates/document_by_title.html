@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta charset="UTF-8" name = 'viewport' content = 'width = device-width, initial-scale = 1'>
+    <title>文章</title>
+    <link rel = "stylesheet" type = "text/css" href = "{{url_for('index.static', filename = 'CSS/bootstrap.min.css')}}">
+    <script src = "{{ url_for('index.static', filename = 'js/jquery-3.1.0.min.js')}}"></script>
+    <script src = "{{ url_for('index.static', filename = 'js/viewportchecker.js')}}"></script>
+    <link rel = "stylesheet" type = "text/css" href = "{{url_for('index.static', filename = 'CSS/animate.css')}}">
+    <script type="text/javascript">
+        $(document).ready(function() {
+	        $('div.post').addClass("animate_hidden").viewportChecker({
+	            classToAdd: 'visible animated bounceInUp', // Class to add to the elements when they are visible
+	             offset: 100
+	        });
+        });
+    </script>
+    <style type="text/css">
+        body#dummybodyid.srp{
+            background-color: #f2f2f2;
+        }
+        div.topbar{
+            height: 30px;
+            width: 100%;
+            position: fixed;
+            line-height: 30px;
+            background: #3b78e7;
+            border: 1px solid #3367d6;
+            top: 0px;
+            padding: 0px;
+            z-index: 1001;
+            text-align: center;
+            }
+        div a{
+            color: #fff;
+        }
+        div.container{
+            margin: 50px auto 20px;
+        }
+        header.top{
+            border-bottom: 1px solid #ddd;
+                }
+        header h1{
+            font-size: 36px;
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: normal;
+            margin: 0px 0px;
+            color: #555;
+        }
+    </style>
+</head>
+<body class="srp" id="dummybodyid">
+
+<div class="topbar"><a>返回</a></div>
+<div class="container">
+    <header class="top">
+        <h1 class="site-title">
+            这是一个标题
+        </h1>
+    </header>
+        {%for path in static_relative_path%}
+            <div class = 'post'><img style="margin: 15px auto 0 auto" class = 'img-thumbnail img-responsive'src="{{url_for('article.static', filename = path|change)}}"></div>
+        {%endfor%}
+</div>
+
+</body>
+</html>
