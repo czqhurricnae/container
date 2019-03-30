@@ -57,7 +57,11 @@ bootstrap = Bootstrap()
 def create_app():
     from .index import index_blueprint
     from .administ import admin_blueprint
+<<<<<<< HEAD
     from .document import documents_blueprint
+=======
+    from.document import documents_blueprint
+>>>>>>> origin/master
     from models import Tool, Project, Advise, Document, ProjectModelView, ToolModelView, DocumentModelView
     app = Flask(
         __name__,
