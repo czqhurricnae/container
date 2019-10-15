@@ -16,14 +16,12 @@ UPLOAD_PATH = path.join(BASE_URL, u'upload')
 INSTANCE_PATH = path.join(BASE_URL, u'instance')
 STATIC_PATH = path.join(BASE_URL, u'static')
 DATABASE_PATH = path.join(BASE_URL, u'database.db')
-
 """
 pass
 
 import sae.const
 import MySQLdb
 """
-
 """
 Must have a circular import between `my_app/__init__.py` and `my_app/index/views.py`,or it could show error
 'Not Found
@@ -57,17 +55,12 @@ bootstrap = Bootstrap()
 def create_app():
     from .index import index_blueprint
     from .administ import admin_blueprint
-<<<<<<< HEAD
     from .document import documents_blueprint
-=======
-    from.document import documents_blueprint
->>>>>>> origin/master
     from models import Tool, Project, Advise, Document, ProjectModelView, ToolModelView, DocumentModelView
-    app = Flask(
-        __name__,
-        instance_path=INSTANCE_PATH,
-        static_folder=STATIC_PATH,
-        instance_relative_config=True)
+    app = Flask(__name__,
+                instance_path=INSTANCE_PATH,
+                static_folder=STATIC_PATH,
+                instance_relative_config=True)
     app.config.from_pyfile('configuration.cfg')
     """
     local:
