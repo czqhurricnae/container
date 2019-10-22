@@ -1,6 +1,6 @@
 """"
 app.config.from_object('my_configuration.BaseConfig')
-must be in the same level of  instance 'app' package
+must be in the same level of  instance 'app' package.
 """
 
 

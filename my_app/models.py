@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+from flask import url_for
 from my_app import db
 from jieba.analyse import ChineseAnalyzer
 from flask_admin.contrib.sqla import ModelView
@@ -42,10 +43,9 @@ class Project(db.Model):
     chapter = db.Column(db.UnicodeText(64))
     date = db.Column(db.DATE, default=datetime.now)
     the_tools = db.relationship(u'Tool', backref=u'belong', lazy=u'dynamic')
-    the_advises = db.relationship(
-        u'Advise',
-        backref=u'improve',
-        lazy=u'dynamic')
+    the_advises = db.relationship(u'Advise',
+                                  backref=u'improve',
+                                  lazy=u'dynamic')
 
     def __init__(self, title, model, chapter, date):
         self.title = title
@@ -54,8 +54,8 @@ class Project(db.Model):
         self.date = date
 
     def __repr__(self):
-        return u'项目:%s, 机型:%s, 章节:%s, 时间:%s' % (
-            self.title, self.model, self.chapter, self.date)
+        return u'项目:%s, 机型:%s, 章节:%s, 时间:%s' % (self.title, self.model,
+                                                self.chapter, self.date)
 
 
 class Document(db.Model):
@@ -82,8 +82,8 @@ class Document(db.Model):
             secret_key='2EnOtEoK90ycVpmjUn4BHVYYy5zmzx',
             bucket_name='filessystem',
             endpoint='http://oss-cn-shanghai.aliyuncs.com')
-        return filesystem.storage.generate_url(
-            file_path=self.path, expires=5 * 60)
+        return filesystem.storage.generate_url(file_path=self.path,
+                                               expires=5 * 60)
 
 
 class Advise(db.Model):
@@ -94,32 +94,27 @@ class Advise(db.Model):
     date = db.Column(db.DATE, default=datetime.now)
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
 
-
     def __init__(self, name, advise, project_id):
         self.name = name
         self.advise = advise
         self.project_id = project_id
-
 
     def __repr__(self):
         return u'<Advise 关于{0:s}的一些建议>'.format(self.improve.title)
 
 
 class ProjectModelView(ModelView):
-    inline_models = [
-        (Tool, dict(
-            form_label=u'工具清单')), (Advise, dict(
-                form_label=u"Advise"))]
-    column_searchable_list = ('title',)
-    column_labels = dict(
-        title=u'拆装项目',
-        model=u'机型',
-        chapter=u'章节号',
-        date=u'更新日期')
+    inline_models = [(Tool, dict(form_label=u'工具清单')),
+                     (Advise, dict(form_label=u"Advise"))]
+    column_searchable_list = ('title', )
+    column_labels = dict(title=u'拆装项目',
+                         model=u'机型',
+                         chapter=u'章节号',
+                         date=u'更新日期')
     """
     column_descriptions = dict(the_tools = u'点击",Add Tool = "按钮,添加工具清单')
     对于描述数据库模型关系的字段(如'the_tools','project_id')使用`column_descriptions`
-    进行内容填写的说明是不起作用的
+    进行内容填写的说明是不起作用的.
     """
 
     def scaffold_form(self):
@@ -158,17 +153,17 @@ class ToolModelView(ModelView):
         rules.Header(u'校验'),
         rules.Field(u'belong'),
     ]
-    column_searchable_list = ('project_title',)
+    column_searchable_list = ('project_title', )
     column_sortable_list = ('project_title', 'name')
-    column_labels = dict(
-        project_title=u'项目',
-        name=u'名称',
-        size=u'尺寸',
-        number=u'数量',
-        description=u'备注',
-        Belong=u'校验')
+    column_labels = dict(project_title=u'项目',
+                         name=u'名称',
+                         size=u'尺寸',
+                         number=u'数量',
+                         description=u'备注',
+                         Belong=u'校验')
     column_descriptions = dict(
-        project_title=u'工具所用于的拆装项目,请保证"Belong"列的内容与项目名一致(例如"737更换滑行灯工具"对应"<"Object 737更换滑行灯工具">"),保证录入工具和拆装项目匹配',
+        project_title=
+        u'工具所用于的拆装项目,请保证"Belong"列的内容与项目名一致(例如"737更换滑行灯工具"对应"<"Object 737更换滑行灯工具">"),保证录入工具和拆装项目匹配',
         number=u'若不填,系统默认为1',
         name=u'工具的名称',
         size=u'工具的大小或者尺寸')
@@ -185,20 +180,10 @@ class DocumentModelView(ModelView):
         rules.Field(u'chapter'),
         rules.Field(u'date'),
     ]
-    column_searchable_list = (
-        'title',
-        'path',
-        'office',
-        'model',
-        'chapter',
-        'date')
-    column_sortable_list = (
-        'title',
-        'path',
-        'office',
-        'model',
-        'chapter',
-        'date')
+    column_searchable_list = ('title', 'path', 'office', 'model', 'chapter',
+                              'date')
+    column_sortable_list = ('title', 'path', 'office', 'model', 'chapter',
+                            'date')
     column_labels = dict(
         title=u'文档名称',
         path=u'存放路径',
@@ -208,6 +193,4 @@ class DocumentModelView(ModelView):
         chapter=u'章节号',
         date=u'日期',
     )
-    column_descriptions = dict(
-        search_column=u'用于程序搜索文档使用,无参考意义',
-    )
+    column_descriptions = dict(search_column=u'用于程序搜索文档使用,无参考意义', )

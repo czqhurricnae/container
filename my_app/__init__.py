@@ -34,15 +34,16 @@ in the browser.
 To avoid the circular import, we choose to use the `blueprint`
 """
 """"
-the definition is `def register_blueprint(self, blueprint, **options)`
-1.the value of parameter`blueprint` in the definition can not be a `str`
-for  instance, `app.register_blueprint('index')` may cause error:`AttributeError: 'str' object has no attribute 'name'`
+The definition is `def register_blueprint(self, blueprint, **options)`
 
-2.first initialize a blueprint in `my_app/hello/views.py`, then import the blueprint through `from my_app.hello.views import index`
+1. The value of parameter`blueprint` in the definition can not be a `str`
+for instance, `app.register_blueprint('index')` may cause error:`AttributeError: 'str' object has no attribute 'name'`
 
-3.second insert the blueprint `index` that we just create in `my_app/hello/views.py` into the blueprints through 'app.register_blueprint(index)'
+2. First initialize a blueprint in `my_app/hello/views.py`, then import the blueprint through `from my_app.hello.views import index`
 
-4.the name of blueprint you import here can not the same as any function name where the blueprint imported from, or will cause an error:`AttributeError: 'function' object has no attribute 'name'`
+3. Second insert the blueprint `index` that we just create in `my_app/hello/views.py` into the blueprints through 'app.register_blueprint(index)'
+
+4. The name of blueprint you import here can not the same as any function name where the blueprint imported from, or will cause an error:`AttributeError: 'function' object has no attribute 'name'`
 """
 
 db = SQLAlchemy()
@@ -75,7 +76,8 @@ def create_app():
                                             %(sae.const.MYSQL_USER,sae.const.MYSQL_PASS, \
                                               sae.const.MYSQL_HOST, int(sae.const.MYSQL_PORT), sae.const.MYSQL_DB)
     """
-    app.config['SQLALCHEMY_DATABASE_URI'] = r'sqlite:///{}'.format(DATABASE_PATH)
+    app.config['SQLALCHEMY_DATABASE_URI'] = r'sqlite:///{}'.format(
+        DATABASE_PATH)
     app.config['WHOOSH_BASE'] = '{}/whoosh'.format(BASE_URL)
     app.config['WHOOSH_DISABLED'] = False
     app.register_blueprint(index_blueprint)
@@ -86,23 +88,27 @@ def create_app():
         db.create_all()
     container_whooshalchemyplus.init_app(app)
     admin.init_app(app)
-    admin.add_view(ProjectModelView(model=Project, session=db.session, name=u'拆装项目清单'))
-    admin.add_view(ToolModelView(model=Tool, session=db.session, name=u'拆装工具清单'))
-    admin.add_view(DocumentModelView(model=Document, session=db.session, name=u'文档清单'))
+    admin.add_view(
+        ProjectModelView(model=Project, session=db.session, name=u'拆装项目清单'))
+    admin.add_view(
+        ToolModelView(model=Tool, session=db.session, name=u'拆装工具清单'))
+    admin.add_view(
+        DocumentModelView(model=Document, session=db.session, name=u'文档清单'))
     # admin.add_view(FileAdmin(base_path= UPLOAD_PATH, name = u'本地文件'))
     admin.add_view(
-        OSSFileAdmin(
-            access_key='2zdr2JCTOpn9viiK',
-            secret_key='2EnOtEoK90ycVpmjUn4BHVYYy5zmzx',
-            bucket_name='filessystem',
-            endpoint='http://oss-cn-shanghai.aliyuncs.com',
-            name=u'阿里云存储'))
+        OSSFileAdmin(access_key='2zdr2JCTOpn9viiK',
+                     secret_key='2EnOtEoK90ycVpmjUn4BHVYYy5zmzx',
+                     bucket_name='filessystem',
+                     endpoint='http://oss-cn-shanghai.aliyuncs.com',
+                     name=u'阿里云存储'))
     babel.init_app(app)
     bootstrap.init_app(app)
     # toolbar.init_app(app)
     return app
+
+
 """
-the initialization of db must be after all the configuration of app have been done, or the configuration of 'SQLALCHEMY_TRACK_MODIFICATIONS = True'
+The initialization of db must be after all the configuration of app have been done, or the configuration of 'SQLALCHEMY_TRACK_MODIFICATIONS = True'
 may not affect and cause warning:
 UserWarning: SQLALCHEMY_TRACK_MODIFICATIONS adds significant overhead and will be disabled by default in the future.
 Set it to True to suppress this warning.
@@ -111,5 +117,5 @@ Set it to True to suppress this warning.')
 """
 """
 Actually, application not registered on db instance and no application bound to current context,
-used in factory method to initialize the app`db.init_app(app)`
+used in factory method to initialize the app `db.init_app(app)`.
 """
