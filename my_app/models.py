@@ -138,6 +138,14 @@ class ProjectModelView(ModelView):
         self._on_model_change(form, model, True)
         self.session.commit()
 
+    def render(self, template, **kwargs):
+        """
+        using extra_js in render method allow use
+        'url_for' that itselt requires an app context.
+        """
+        self.extra_js = [url_for('static', filename='js/enhance.js')]
+        return super(ProjectModelView, self).render(template, **kwargs)
+
 
 class ToolModelView(ModelView):
     form_rules = [
