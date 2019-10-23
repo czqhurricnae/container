@@ -818,31 +818,32 @@ class OSSFileAdmin(BaseFileAdmin):
         items.sort(key=itemgetter(2), reverse=True)
 
         # Sort by modified date
-        items.sort(
-            key=lambda values: (
-                values[0],
-                values[1],
-                values[2],
-                values[3],
-                datetime.fromtimestamp(
-                    values[4])),
-            reverse=True)
+        items.sort(key=lambda values: (values[0], values[1], values[2], values[
+            3], datetime.fromtimestamp(values[4])),
+                   reverse=True)
 
         # Generate breadcrumbs
         breadcrumbs = self._get_breadcrumbs(path)
 
         # Actions
         actions, actions_confirmation = self.get_actions_list()
+        if actions:
+            action_form = self.action_form()
+        else:
+            action_form = None
 
-        return self.render(self.list_template,
-                           dir_path=path,
-                           breadcrumbs=breadcrumbs,
-                           get_dir_url=self._get_dir_url,
-                           get_file_url=self._get_file_url,
-                           items=items,
-                           actions=actions,
-                           actions_confirmation=actions_confirmation,
-                           delete_form=delete_form)
+        return self.render(
+            self.list_template,
+            dir_path=path,
+            breadcrumbs=breadcrumbs,
+            get_dir_url=self._get_dir_url,
+            get_file_url=self._get_file_url,
+            items=items,
+            actions=actions,
+            actions_confirmation=actions_confirmation,
+            action_form=action_form,
+            delete_form=delete_form,
+        )
 
     @expose('/mkdir/', methods=('GET', 'POST'))
     @expose('/mkdir/<path:path>', methods=('GET', 'POST'))
