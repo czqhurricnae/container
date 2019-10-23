@@ -19,49 +19,15 @@ from flask_admin.form.widgets import DatePickerWidget
 from wtforms import fields
 import itertools
 
-
-DEFAULT_CHAPTERS = (
-    u'05时间与限制',
-    u'06尺寸和区域',
-    u'12勤务',
-    u'20标准施工',
-    u'21空调',
-    u'22自动驾驶',
-    u'23通讯',
-    u'24电源',
-    u'25设备与装饰',
-    u'26防火',
-    u'27飞行操纵',
-    u'28燃油',
-    u'29液压系统',
-    u'30防冰防雨',
-    u'31指示系统',
-    u'32起落架',
-    u'33灯光',
-    u'34导航',
-    u'35氧气系统',
-    u'36引气系统',
-    u'38饮用水和灰水系统',
-    u'47NGS',
-    u'49辅助动力装置',
-    u'51结构',
-    u'52门',
-    u'53机身',
-    u'54发动机短舱和吊架',
-    u'55安定面',
-    u'56窗户',
-    u'57机翼',
-    u'70standard practices',
-    u'71飞行动力',
-    u'72发动机',
-    u'73发动机燃油和控制',
-    u'74发动机点火',
-    u'75发动机空气',
-    u'76发动机控制',
-    u'77发动机指示',
-    u'78发动机排气',
-    u'79发动机滑油',
-    u'80发动机起动')
+DEFAULT_CHAPTERS = (u'05时间与限制', u'06尺寸和区域', u'12勤务', u'20标准施工', u'21空调',
+                    u'22自动驾驶', u'23通讯', u'24电源', u'25设备与装饰', u'26防火',
+                    u'27飞行操纵', u'28燃油', u'29液压系统', u'30防冰防雨', u'31指示系统',
+                    u'32起落架', u'33灯光', u'34导航', u'35氧气系统', u'36引气系统',
+                    u'38饮用水和灰水系统', u'47NGS', u'49辅助动力装置', u'51结构', u'52门',
+                    u'53机身', u'54发动机短舱和吊架', u'55安定面', u'56窗户', u'57机翼',
+                    u'70standard practices', u'71飞行动力', u'72发动机',
+                    u'73发动机燃油和控制', u'74发动机点火', u'75发动机空气', u'76发动机控制',
+                    u'77发动机指示', u'78发动机排气', u'79发动机滑油', u'80发动机起动')
 
 DEFAULT_MODELS = (u'737', u'757', u'787')
 
@@ -80,11 +46,7 @@ class MyFileInput:
         kwargs.setdefault('id', field.id)
         return HTMLString(
             '<input %s>' %
-            html_params(
-                name=field.name,
-                multiple='',
-                type='file',
-                **kwargs))
+            html_params(name=field.name, multiple='', type='file', **kwargs))
 
 
 class MyFileField(StringField):
@@ -122,8 +84,8 @@ class MyListWidget:
                 html.append('<li>%s %s</li>' % (subfield.label, subfield()))
             else:
                 html.append(
-                    '<li style = "list-style: none; float: left; display: inline-block; margin-right : 12px">%s %s</li>' %
-                    (subfield(), subfield.label))
+                    '<li style = "list-style: none; float: left; display: inline-block; margin-right : 12px">%s %s</li>'
+                    % (subfield(), subfield.label))
         html.append('</%s> <div style="clear:both;"></div>' % self.html_tag)
         return HTMLString(''.join(html))
 
@@ -140,7 +102,6 @@ def get_default(aSet, seq):
 
 
 class ALiYunStorage:
-
     def __init__(self, bucket_name, access_key, secret_key, endpoint):
         self.endpoint = endpoint
         self.auth = oss2.Auth(access_key, secret_key)
@@ -165,10 +126,9 @@ class ALiYunStorage:
         directories = []
         if path and not path.endswith(self.separator):
             path += self.separator
-        for obj in oss2.ObjectIterator(
-                bucket=self.bucket,
-                prefix=path,
-                delimiter=self.separator):
+        for obj in oss2.ObjectIterator(bucket=self.bucket,
+                                       prefix=path,
+                                       delimiter=self.separator):
             if obj.key == path:
                 continue
             if obj.is_prefix():
@@ -193,10 +153,10 @@ class ALiYunStorage:
         if path and not path.endswith(self.separator):
             path += self.separator
         return {
-            obj.key for obj in oss2.ObjectIterator(
-                bucket=self.bucket,
-                prefix=path,
-                delimiter=self.separator)}
+            obj.key
+            for obj in oss2.ObjectIterator(
+                bucket=self.bucket, prefix=path, delimiter=self.separator)
+        }
 
     def is_dir(self, path):
         keys = self._get_path_keys(path)
@@ -234,10 +194,7 @@ class ALiYunStorage:
 
     def send_file(self, file_path):
         return redirect(
-            self.bucket.sign_url(
-                method='GET',
-                key=file_path,
-                expires=60))
+            self.bucket.sign_url(method='GET', key=file_path, expires=60))
 
     def save_file(self, path, file_data):
         """
@@ -263,8 +220,7 @@ class ALiYunStorage:
 
     def _check_empty_directory(self, path):
         if not self._is_directory_empty(path):
-            raise ValueError('Cannot operate on non empty '
-                             'directories')
+            raise ValueError('Cannot operate on non empty ' 'directories')
         return True
 
     def _is_directory_empty(self, path):
@@ -284,15 +240,15 @@ class ALiYunStorage:
             self._check_empty_directory(src)
             src += self.separator
             dst += self.separator
-        self.bucket.copy_object(
-            source_bucket_name=self.bucket.bucket_name,
-            source_key=src,
-            target_key=dst)
+        self.bucket.copy_object(source_bucket_name=self.bucket.bucket_name,
+                                source_key=src,
+                                target_key=dst)
         self.delete_file(src)
 
     def generate_url(self, file_path, expires):
-        return self.bucket.sign_url(
-            method='GET', key=file_path, expires=expires)
+        return self.bucket.sign_url(method='GET',
+                                    key=file_path,
+                                    expires=expires)
 
 
 class OSSFileAdmin(BaseFileAdmin):
@@ -329,14 +285,8 @@ class OSSFileAdmin(BaseFileAdmin):
     mkdir_template = 'admin/my_form.html'
     rename_template = 'admin/my_form.html'
 
-    def __init__(
-            self,
-            bucket_name,
-            access_key,
-            secret_key,
-            endpoint,
-            *args,
-            **kwargs):
+    def __init__(self, bucket_name, access_key, secret_key, endpoint, *args,
+                 **kwargs):
         storage = ALiYunStorage(bucket_name, access_key, secret_key, endpoint)
         super(OSSFileAdmin, self).__init__(*args, storage=storage, **kwargs)
 
@@ -354,8 +304,8 @@ class OSSFileAdmin(BaseFileAdmin):
            :return:
         """
         existed_name = [
-            item[0] for item in self.storage.get_files(
-                path=dir_base)]
+            item[0] for item in self.storage.get_files(path=dir_base)
+        ]
         return filename in existed_name
 
     def on_rename(self, full_path, dir_base, filename):
@@ -368,14 +318,8 @@ class OSSFileAdmin(BaseFileAdmin):
         """
         pass
 
-    def on_edit_document(
-            self,
-            full_path,
-            dir_base,
-            filename,
-            office,
-            chapter,
-            date):
+    def on_edit_document(self, full_path, dir_base, filename, office, chapter,
+                         date):
         """
         :param full_path:
         :param dir_base:  os.path.normpath(full_path)
@@ -390,8 +334,8 @@ class OSSFileAdmin(BaseFileAdmin):
                     db_obj = Document.query.filter_by(
                         path=unicode(full_path)).first()
                     db_obj.title = unicode(filename)
-                    db_obj.path = unicode(
-                        dir_base + self._separator + filename)
+                    db_obj.path = unicode(dir_base + self._separator +
+                                          filename)
                     db_obj.search_column = db_obj.path.replace(
                         self._separator, '')
                     db_obj.office = office
@@ -420,11 +364,9 @@ class OSSFileAdmin(BaseFileAdmin):
             db.session.commit()
         except Exception as ex:
             flash(
-                gettext(
-                    u'从数据库删除相应记录%(full_path)s失败,错误:%(error)s',
-                    full_path=full_path,
-                    error=ex),
-                'error')
+                gettext(u'从数据库删除相应记录%(full_path)s失败,错误:%(error)s',
+                        full_path=full_path,
+                        error=ex), 'error')
             db.session.rollback()
 
     def get_upload_form(self, directory):
@@ -448,50 +390,68 @@ class OSSFileAdmin(BaseFileAdmin):
                     default_model = None
                     default_chapter = None
             upload = MyFileField(lazy_gettext(u'上传文件'))
-            office = MySelectField(label=lazy_gettext(u'处室'), coerce=unicode, choices=[
-                (u'航线处', u'航线处'), (u'技术服务处', u'技术服务处'), (u'质量处', u'质量处')])
+            office = MySelectField(label=lazy_gettext(u'处室'),
+                                   coerce=unicode,
+                                   choices=[(u'航线处', u'航线处'),
+                                            (u'技术服务处', u'技术服务处'),
+                                            (u'质量处', u'质量处')])
             model = MySelectField(
                 label=lazy_gettext(u'机型'),
                 coerce=int,
+                choices=[(737, '737'), (757, '757'), (787, '787')],
+                default=default_model if default_model is not None
+                and default_model in DEFAULT_MODELS else None)
+            chapter = MyRadioField(
+                label=u'章节号',
+                coerce=int,
                 choices=[
-                    (737,
-                     '737'),
-                    (757,
-                     '757'),
-                    (787,
-                     '787')],
-                default=default_model if default_model is not None and default_model in DEFAULT_MODELS else None)
-            chapter = MyRadioField(label=u'章节号', coerce=int,
-                                   choices=[
-                                       (0o5, u'05时间与限制'), (0o6, u'06尺寸和区域'),
-                                       (12, u'12勤务'), (20, u'20标准施工'),
-                                       (21, u'21空调'), (22, u'22自动驾驶'),
-                                       (23, u'23通讯'), (24, u'24电源'),
-                                       (25, u'25设备与装饰'), (26, u'26防火'),
-                                       (27, u'27飞行操纵'), (28, u'28燃油'),
-                                       (29, u'29液压系统'), (30, u'30防冰防雨'),
-                                       (31, u'31指示系统'), (32, u'32起落架'),
-                                       (33, u'33灯光'), (34, u'34导航'),
-                                       (35, u'35氧气系统'), (36, u'36引气系统'),
-                                       (38, u'38饮用水和灰水系统'), (47, u'47NGS'),
-                                       (49, u'49辅助动力装置'),
-                                       (51, u'51结构'), (52, u'52门'),
-                                       (53, u'53机身'), (54, u'54发动机短舱和吊架'),
-                                       (55, u'55安定面'), (56, u'56窗户'),
-                                       (57, u'57机翼'), (70, u'70standard practices'),
-                                       (71, u'71飞行动力'), (72, u'72发动机'),
-                                       (73, u'73发动机燃油和控制'), (74, u'74发动机点火'),
-                                       (75, u'75发动机空气'), (76, u'76发动机控制'),
-                                       (77, u'77发动机指示'), (78, u'78发动机排气'),
-                                       (79, u'79发动机滑油'), (80, u'80发动机起动'),
-                                   ],
-                                   default=default_chapter[
-                                       0:2] if default_chapter is not None and default_chapter in DEFAULT_CHAPTERS else None
-                                   )
-            date = DateField(
-                label=u'编辑日期',
-                format='%m/%d/%Y',
-                widget=DatePickerWidget())
+                    (0o5, u'05时间与限制'),
+                    (0o6, u'06尺寸和区域'),
+                    (12, u'12勤务'),
+                    (20, u'20标准施工'),
+                    (21, u'21空调'),
+                    (22, u'22自动驾驶'),
+                    (23, u'23通讯'),
+                    (24, u'24电源'),
+                    (25, u'25设备与装饰'),
+                    (26, u'26防火'),
+                    (27, u'27飞行操纵'),
+                    (28, u'28燃油'),
+                    (29, u'29液压系统'),
+                    (30, u'30防冰防雨'),
+                    (31, u'31指示系统'),
+                    (32, u'32起落架'),
+                    (33, u'33灯光'),
+                    (34, u'34导航'),
+                    (35, u'35氧气系统'),
+                    (36, u'36引气系统'),
+                    (38, u'38饮用水和灰水系统'),
+                    (47, u'47NGS'),
+                    (49, u'49辅助动力装置'),
+                    (51, u'51结构'),
+                    (52, u'52门'),
+                    (53, u'53机身'),
+                    (54, u'54发动机短舱和吊架'),
+                    (55, u'55安定面'),
+                    (56, u'56窗户'),
+                    (57, u'57机翼'),
+                    (70, u'70standard practices'),
+                    (71, u'71飞行动力'),
+                    (72, u'72发动机'),
+                    (73, u'73发动机燃油和控制'),
+                    (74, u'74发动机点火'),
+                    (75, u'75发动机空气'),
+                    (76, u'76发动机控制'),
+                    (77, u'77发动机指示'),
+                    (78, u'78发动机排气'),
+                    (79, u'79发动机滑油'),
+                    (80, u'80发动机起动'),
+                ],
+                default=default_chapter[0:2] if default_chapter is not None
+                and default_chapter in DEFAULT_CHAPTERS else None)
+            date = DateField(label=u'编辑日期',
+                             format='%m/%d/%Y',
+                             widget=DatePickerWidget())
 
             def __init__(self, *args, **kwargs):
                 super(UploadForm, self).__init__(*args, **kwargs)
@@ -518,7 +478,8 @@ class OSSFileAdmin(BaseFileAdmin):
 
         def validate_name(self, field):
             regexp = re.compile(
-                r'^(?!^(PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*)(\..+)?$)[^\x00-\x1f\\?*:\";|/]+$')
+                r'^(?!^(PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*)(\..+)?$)[^\x00-\x1f\\?*:\";|/]+$'
+            )
             if not regexp.match(field.data):
                 raise validators.ValidationError(gettext('Invalid name'))
 
@@ -528,9 +489,9 @@ class OSSFileAdmin(BaseFileAdmin):
 
                 Validates if provided name is valid for *nix and Windows systems.
             """
-            name = fields.StringField(lazy_gettext('Name'),
-                                      validators=[validators.Required(),
-                                                  validate_name])
+            name = fields.StringField(
+                lazy_gettext('Name'),
+                validators=[validators.Required(), validate_name])
             path = fields.HiddenField()
 
         return NameForm
@@ -544,7 +505,8 @@ class OSSFileAdmin(BaseFileAdmin):
 
         def validate_name(self, field):
             regexp = re.compile(
-                r'^(?!^(PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*)(\..+)?$)[^\x00-\x1f\\?*:\";|/]+$')
+                r'^(?!^(PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*)(\..+)?$)[^\x00-\x1f\\?*:\";|/]+$'
+            )
             if not regexp.match(field.data):
                 raise validators.ValidationError(gettext('Invalid name'))
 
@@ -562,47 +524,73 @@ class OSSFileAdmin(BaseFileAdmin):
                 except ValueError:
                     default_model = None
                     default_chapter = None
-            name = fields.StringField(lazy_gettext(u'重名命'),
-                                      validators=[validators.Required(),
-                                                  validate_name])
+            name = fields.StringField(
+                lazy_gettext(u'重名命'),
+                validators=[validators.Required(), validate_name])
             path = fields.HiddenField()
 
-            office = MySelectField(label=lazy_gettext(u'处室'), coerce=unicode, choices=[
-                (u'航线处', u'航线处'), (u'技术服务处', u'技术服务处'), (u'质量处', u'质量处')])
+            office = MySelectField(label=lazy_gettext(u'处室'),
+                                   coerce=unicode,
+                                   choices=[(u'航线处', u'航线处'),
+                                            (u'技术服务处', u'技术服务处'),
+                                            (u'质量处', u'质量处')])
             model = MySelectField(
-                label=lazy_gettext(u'机型'), coerce=int, choices=[
-                    (737, '737'), (757, '757'), (787, '787')],
-                default=default_model if default_model is not None and default_model in DEFAULT_MODELS else None)
-            chapter = MyRadioField(label=u'章节号', coerce=int,
-                                   choices=[
-                                       (0o5, u'05时间限制'), (0o6, u'06尺寸和区域'),
-                                       (12, u'12勤务'), (20, u'20标准施工'),
-                                       (21, u'21空调'), (22, u'22自动驾驶'),
-                                       (23, u'23通讯'), (24, u'24电源'),
-                                       (25, u'25设备与装饰'), (26, u'26防火'),
-                                       (27, u'27飞行操纵'), (28, u'28燃油'),
-                                       (29, u'29液压系统'), (30, u'30防冰防雨'),
-                                       (31, u'31指示系统'), (32, u'32起落架'),
-                                       (33, u'33灯光'), (34, u'34导航'),
-                                       (35, u'35氧气系统'), (36, u'36引气系统'),
-                                       (38, u'38饮用水和灰水系统'), (47, u'47NGS'),
-                                       (49, u'49辅助动力装置'),
-                                       (51, u'51结构'), (52, u'52门'),
-                                       (53, u'53机身'), (54, u'54发动机短舱和吊架'),
-                                       (55, u'55安定面'), (56, u'56窗户'),
-                                       (57, u'57机翼'), (70, u'70standard practices'),
-                                       (71, u'71飞行动力'), (72, u'72发动机'),
-                                       (73, u'73发动机燃油和控制'), (74, u'74发动机点火'),
-                                       (75, u'75发动机空气'), (76, u'76发动机控制'),
-                                       (77, u'77发动机指示'), (78, u'78发动机排气'),
-                                       (79, u'79发动机滑油'), (80, u'80发动机起动'),
-                                   ],
-                                   default=default_chapter[0:2] if default_chapter is not None and default_chapter in DEFAULT_CHAPTERS else None
-                                   )
-            date = DateField(
-                label=u'编辑日期',
-                format='%m/%d/%Y',
-                widget=DatePickerWidget())
+                label=lazy_gettext(u'机型'),
+                coerce=int,
+                choices=[(737, '737'), (757, '757'), (787, '787')],
+                default=default_model if default_model is not None
+                and default_model in DEFAULT_MODELS else None)
+            chapter = MyRadioField(
+                label=u'章节号',
+                coerce=int,
+                choices=[
+                    (0o5, u'05时间限制'),
+                    (0o6, u'06尺寸和区域'),
+                    (12, u'12勤务'),
+                    (20, u'20标准施工'),
+                    (21, u'21空调'),
+                    (22, u'22自动驾驶'),
+                    (23, u'23通讯'),
+                    (24, u'24电源'),
+                    (25, u'25设备与装饰'),
+                    (26, u'26防火'),
+                    (27, u'27飞行操纵'),
+                    (28, u'28燃油'),
+                    (29, u'29液压系统'),
+                    (30, u'30防冰防雨'),
+                    (31, u'31指示系统'),
+                    (32, u'32起落架'),
+                    (33, u'33灯光'),
+                    (34, u'34导航'),
+                    (35, u'35氧气系统'),
+                    (36, u'36引气系统'),
+                    (38, u'38饮用水和灰水系统'),
+                    (47, u'47NGS'),
+                    (49, u'49辅助动力装置'),
+                    (51, u'51结构'),
+                    (52, u'52门'),
+                    (53, u'53机身'),
+                    (54, u'54发动机短舱和吊架'),
+                    (55, u'55安定面'),
+                    (56, u'56窗户'),
+                    (57, u'57机翼'),
+                    (70, u'70standard practices'),
+                    (71, u'71飞行动力'),
+                    (72, u'72发动机'),
+                    (73, u'73发动机燃油和控制'),
+                    (74, u'74发动机点火'),
+                    (75, u'75发动机空气'),
+                    (76, u'76发动机控制'),
+                    (77, u'77发动机指示'),
+                    (78, u'78发动机排气'),
+                    (79, u'79发动机滑油'),
+                    (80, u'80发动机起动'),
+                ],
+                default=default_chapter[0:2] if default_chapter is not None
+                and default_chapter in DEFAULT_CHAPTERS else None)
+            date = DateField(label=u'编辑日期',
+                             format='%m/%d/%Y',
+                             widget=DatePickerWidget())
 
         return NameForm
 
@@ -637,8 +625,9 @@ class OSSFileAdmin(BaseFileAdmin):
             if self.storage.file_exists(path, file.filename):
                 secure_name = self._separator.join(
                     [path, secure_filename(form.upload.data.filename)])
-                raise Exception(gettext('File "%(name)s" already exists.',
-                                        name=secure_name))
+                raise Exception(
+                    gettext('File "%(name)s" already exists.',
+                            name=secure_name))
             else:
                 self.save_file(save_path, file)
                 try:
@@ -646,13 +635,12 @@ class OSSFileAdmin(BaseFileAdmin):
                     if file_extension in EXTENSIONS:
                         title = directory.strip(
                             self._separator) if directory.strip(
-                            self._separator) != '' else file.filename
+                                self._separator) != '' else file.filename
                     else:
                         title = file.filename
                 except IndexError:
                     title = file.filename
-                file_path = save_path.strip(
-                    self._separator) if save_path.find(
+                file_path = save_path.strip(self._separator) if save_path.find(
                     self._separator) == 0 else save_path
                 search_column = file_path.replace(self._separator, '')
                 office = form.office.data
@@ -660,23 +648,19 @@ class OSSFileAdmin(BaseFileAdmin):
                 chapter = form.chapter.data
                 date = form.date.data
 
-                document = Document(
-                    title=unicode(title),
-                    path=unicode(file_path),
-                    search_column=unicode(search_column),
-                    model=unicode(model),
-                    chapter=unicode(chapter),
-                    date=unicode(date),
-                    office=unicode(office))
+                document = Document(title=unicode(title),
+                                    path=unicode(file_path),
+                                    search_column=unicode(search_column),
+                                    model=unicode(model),
+                                    chapter=unicode(chapter),
+                                    date=unicode(date),
+                                    office=unicode(office))
                 db.session.add(document)
                 try:
                     db.session.commit()
                 except Exception as ex:
-                    flash(
-                        gettext(
-                            u'上传文件时保存数据库失败,错误:%(error)s',
-                            error=ex),
-                        'error')
+                    flash(gettext(u'上传文件时保存数据库失败,错误:%(error)s', error=ex),
+                          'error')
                     db.session.rollback()
                 self.on_file_upload(directory, path, save_path)
 
@@ -727,22 +711,21 @@ class OSSFileAdmin(BaseFileAdmin):
         if self.validate_form(form):
             try:
                 self._save_form_files(directory, path, form)
-                flash(gettext('Successfully saved file: %(name)s',
-                              name=form.upload.data.filename), 'success')
+                flash(
+                    gettext('Successfully saved file: %(name)s',
+                            name=form.upload.data.filename), 'success')
                 return redirect(self._get_dir_url('.index_view', path))
             except Exception as ex:
-                flash(
-                    gettext(
-                        'Failed to save file: %(error)s',
-                        error=ex),
-                    'error')
+                flash(gettext('Failed to save file: %(error)s', error=ex),
+                      'error')
 
         if self.upload_modal and request.args.get('modal'):
             template = self.upload_modal_template
         else:
             template = self.upload_template
 
-        return self.render(template, form=form,
+        return self.render(template,
+                           form=form,
                            header_text=gettext('Upload File'),
                            modal=request.args.get('modal'))
 
@@ -777,16 +760,8 @@ class OSSFileAdmin(BaseFileAdmin):
             if parent_path == '.':
                 parent_path = None
 
-            items.append(
-                ('..',
-                 parent_path,
-                 True,
-                 0,
-                 0,
-                 'null',
-                 'null',
-                 'null',
-                 'null'))
+            items.append(('..', parent_path, True, 0, 0, 'null', 'null',
+                          'null', 'null'))
         for item in self.storage.get_files(path):
             file_name, rel_path, is_dir, size, last_modified = item
             if is_dir is True:
@@ -796,17 +771,11 @@ class OSSFileAdmin(BaseFileAdmin):
                 file_obj = Document.query.filter_by(
                     path=unicode(rel_path)).first()
                 try:
-                    file_meta = (
-                        file_obj.office,
-                        file_obj.model,
-                        file_obj.chapter,
-                        file_obj.date)
+                    file_meta = (file_obj.office, file_obj.model,
+                                 file_obj.chapter, file_obj.date)
                 except Exception as ex:
-                    flash(
-                        gettext(
-                            u'从数据库读取文档的元信息失败:错误:%(error)s',
-                            error=ex),
-                        'error')
+                    flash(gettext(u'从数据库读取文档的元信息失败:错误:%(error)s', error=ex),
+                          'error')
                     file_meta = ('null', 'null', 'null', 'null')
                 item = item + file_meta
             if self.is_accessible_path(rel_path):
@@ -876,14 +845,13 @@ class OSSFileAdmin(BaseFileAdmin):
                     raise Exception('新文件夹"%s"已经存在' % form.name.data)
                 self.storage.make_dir(directory, form.name.data)
                 self.on_mkdir(directory, form.name.data)
-                flash(gettext('Successfully created directory: %(directory)s',
-                              directory=form.name.data), 'success')
+                flash(
+                    gettext('Successfully created directory: %(directory)s',
+                            directory=form.name.data), 'success')
                 return redirect(dir_url)
             except Exception as ex:
                 flash(
-                    gettext(
-                        'Failed to create directory: %(error)s',
-                        error=ex),
+                    gettext('Failed to create directory: %(error)s', error=ex),
                     'error')
         else:
             helpers.flash_errors(
@@ -894,10 +862,12 @@ class OSSFileAdmin(BaseFileAdmin):
         else:
             template = self.mkdir_template
 
-        return self.render(template, form=form, dir_url=dir_url,
+        return self.render(template,
+                           form=form,
+                           dir_url=dir_url,
                            header_text=gettext('Create Directory'))
 
-    @expose('/delete/', methods=('POST',))
+    @expose('/delete/', methods=('POST', ))
     def delete(self):
         """
             Delete view method
@@ -932,33 +902,25 @@ class OSSFileAdmin(BaseFileAdmin):
                     flash(
                         gettext(
                             'Directory "%(path)s" was successfully deleted.',
-                            path=path),
-                        'success')
+                            path=path), 'success')
                 except Exception as ex:
                     flash(
-                        gettext(
-                            'Failed to delete directory: %(error)s',
-                            error=ex),
-                        'error')
+                        gettext('Failed to delete directory: %(error)s',
+                                error=ex), 'error')
             else:
                 try:
                     self.before_file_delete(full_path, path)
                     self.delete_file(full_path)
                     self.on_file_delete(full_path, path)
                     flash(
-                        gettext(
-                            'File "%(name)s" was successfully deleted.',
-                            name=path),
-                        'success')
+                        gettext('File "%(name)s" was successfully deleted.',
+                                name=path), 'success')
                 except Exception as ex:
-                    flash(
-                        gettext(
-                            'Failed to delete file: %(name)s',
-                            name=ex),
-                        'error')
+                    flash(gettext('Failed to delete file: %(name)s', name=ex),
+                          'error')
         else:
-            helpers.flash_errors(
-                form, message='Failed to delete file. %(error)s')
+            helpers.flash_errors(form,
+                                 message='Failed to delete file. %(error)s')
 
         return redirect(return_url)
 
@@ -1002,17 +964,15 @@ class OSSFileAdmin(BaseFileAdmin):
                     raise Exception(u'新名称"%s"已经存在' % filename)
                 self.storage.rename_path(
                     full_path, self._separator.join([dir_base, filename]))
-                self.on_edit_document(
-                    full_path, dir_base, filename, office, chapter, date)
-                flash(gettext('Successfully renamed "%(src)s" to "%(dst)s"',
-                              src=op.basename(path),
-                              dst=filename), 'success')
-            except Exception as ex:
+                self.on_edit_document(full_path, dir_base, filename, office,
+                                      chapter, date)
                 flash(
-                    gettext(
-                        'Failed to rename: %(error)s',
-                        error=ex),
-                    'error')
+                    gettext('Successfully renamed "%(src)s" to "%(dst)s"',
+                            src=op.basename(path),
+                            dst=filename), 'success')
+            except Exception as ex:
+                flash(gettext('Failed to rename: %(error)s', error=ex),
+                      'error')
 
             return redirect(return_url)
         else:
@@ -1025,15 +985,13 @@ class OSSFileAdmin(BaseFileAdmin):
                 self.storage.rename_path(
                     full_path, self._separator.join([dir_base, filename]))
                 self.on_rename(full_path, dir_base, filename)
-                flash(gettext('Successfully renamed "%(src)s" to "%(dst)s"',
-                              src=op.basename(path),
-                              dst=filename), 'success')
-            except Exception as ex:
                 flash(
-                    gettext(
-                        'Failed to rename: %(error)s',
-                        error=ex),
-                    'error')
+                    gettext('Successfully renamed "%(src)s" to "%(dst)s"',
+                            src=op.basename(path),
+                            dst=filename), 'success')
+            except Exception as ex:
+                flash(gettext('Failed to rename: %(error)s', error=ex),
+                      'error')
 
             return redirect(return_url)
         else:
@@ -1044,18 +1002,20 @@ class OSSFileAdmin(BaseFileAdmin):
         else:
             template = self.rename_template
 
-        return self.render(template, form=form, path=op.dirname(path),
-                           name=op.basename(path), dir_url=return_url,
+        return self.render(template,
+                           form=form,
+                           path=op.dirname(path),
+                           name=op.basename(path),
+                           dir_url=return_url,
                            header_text=gettext('Rename %(name)s',
                                                name=op.basename(path)))
 
-    @expose('/action/', methods=('POST',))
+    @expose('/action/', methods=('POST', ))
     def action_view(self):
         return self.handle_action()
 
     # Actions
-    @action('delete',
-            lazy_gettext('Delete'),
+    @action('delete', lazy_gettext('Delete'),
             lazy_gettext('Are you sure you want to delete these files?'))
     def action_delete(self, items):
         if not self.can_delete:
@@ -1070,13 +1030,8 @@ class OSSFileAdmin(BaseFileAdmin):
                     self.delete_file(full_path)
                     self.on_file_delete(full_path, path)
                     flash(
-                        gettext(
-                            'File "%(name)s" was successfully deleted.',
-                            name=path),
-                        'success')
+                        gettext('File "%(name)s" was successfully deleted.',
+                                name=path), 'success')
                 except Exception as ex:
-                    flash(
-                        gettext(
-                            'Failed to delete file: %(name)s',
-                            name=ex),
-                        'error')
+                    flash(gettext('Failed to delete file: %(name)s', name=ex),
+                          'error')
