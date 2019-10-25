@@ -1,7 +1,8 @@
 (function() {
-    $("#the_tools-button").on("click", function() {
+    $("#the_tools-button").click(function(e) {
         // Fill the project tile automatically
-        $("[id$='project_title']").text($("#title").text());
+        e.preventDefault();
+        $("[id$='project_title']").text($("#title").val());
     });
 
     $("#title").on("change keyup paste", function() {
