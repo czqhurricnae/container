@@ -10,6 +10,7 @@ from flask_admin.menu import MenuLink
 #from flask_admin.contrib.fileadmin import FileAdmin
 from aliyun import OSSFileAdmin
 from os import path
+from flask_restful import Api
 
 BASE_URL = path.abspath(path.dirname(__file__))
 UPLOAD_PATH = path.join(BASE_URL, u'upload')
@@ -58,6 +59,7 @@ def create_app():
     from .administ import admin_blueprint
     from .document import documents_blueprint
     from models import Tool, Project, Advise, Document, ProjectModelView, ToolModelView, DocumentModelView
+    from apis import ProjectAPI
     app = Flask(__name__,
                 instance_path=INSTANCE_PATH,
                 static_folder=STATIC_PATH,
@@ -80,6 +82,7 @@ def create_app():
         DATABASE_PATH)
     app.config['WHOOSH_BASE'] = '{}/whoosh'.format(BASE_URL)
     app.config['WHOOSH_DISABLED'] = False
+    app.config.update(RESTFUL_JSON=dict(ensure_ascii=False))
     app.register_blueprint(index_blueprint)
     app.register_blueprint(admin_blueprint)
     app.register_blueprint(documents_blueprint)
@@ -104,6 +107,8 @@ def create_app():
     babel.init_app(app)
     bootstrap.init_app(app)
     # toolbar.init_app(app)
+    api = Api(app)
+    api.add_resource(ProjectAPI, '/api/projects/')
     return app
 
 
