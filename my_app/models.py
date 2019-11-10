@@ -15,9 +15,9 @@ class Tool(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     project_title = db.Column(db.UnicodeText(64))
     name = db.Column(db.UnicodeText(64))
-    size = db.Column(db.UnicodeText(64))
+    size = db.Column(db.UnicodeText())
     number = db.Column(db.Integer, default=1)
-    description = db.Column(db.UnicodeText(64))
+    description = db.Column(db.UnicodeText())
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
 
     def __repr__(self):
