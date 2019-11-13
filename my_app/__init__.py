@@ -59,7 +59,7 @@ def create_app():
     from .administ import admin_blueprint
     from .document import documents_blueprint
     from models import Tool, Project, Advise, Document, ProjectModelView, ToolModelView, DocumentModelView
-    from apis import ProjectAPI
+    from apis import ProjectAPI, SegmentationAPI
     app = Flask(__name__,
                 instance_path=INSTANCE_PATH,
                 static_folder=STATIC_PATH,
@@ -109,6 +109,7 @@ def create_app():
     # toolbar.init_app(app)
     api = Api(app)
     api.add_resource(ProjectAPI, '/api/projects/')
+    api.add_resource(SegmentationAPI, '/api/segmentations/')
     return app
 
 
