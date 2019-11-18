@@ -1,398 +1,440 @@
 <!DOCTYPE html>
 <html lang = 'en'>
     <head>
-    <link lang = 'en'>
-    <meta charset = 'UTF-8' name = 'viewport' content = 'width = device-width, initial-scale = 1'>
-    <link  rel = 'stylesheet' type = 'text/css' href = "{{url_for('index.static',filename = 'CSS/bootstrap.min.css')}}">
-    <title>工具</title>
-    <link rel = 'stylesheet'type = 'text/css' href = "{{url_for('index.static', filename = 'CSS/main.css')}}">
-    <script src = "{{ url_for('index.static', filename = 'js/jquery-3.0.0.js')}}"></script>
-    <script type = 'text/javascript'>
-    $(function ()
-    {
-        $('button#tsbb').bind('click',function ()
+        <link lang = 'en'>
+        <meta charset = 'UTF-8' name = 'viewport' content = 'width = device-width, initial-scale = 1'>
+        <link  rel = 'stylesheet' type = 'text/css' href = "{{url_for('index.static',filename = 'CSS/bootstrap.min.css')}}">
+        <title>工具</title>
+        <link rel = 'stylesheet'type = 'text/css' href = "{{url_for('index.static', filename = 'CSS/main.css')}}">
+        <script src = "{{ url_for('index.static', filename = 'js/jquery-3.0.0.js')}}"></script>
+        <script type = 'text/javascript'>
+        $(function ()
         {
-            var search = $("input[name = 'search']").val();
-            $.getJSON
-            (
-                '/',
-                {
-                    search:JSON.stringify(search)
-                },
-                function(data)
-                {
-                    var projects_tools = data.result.projects_tools;
-
-                    if (projects_tools.length === 0){
-                        $('div#messages').attr('class','alert-warning');
-                        $('div#messages').text('没有相关查询结果,请尝试其他或者更多的关键词');
-                        document.getElementById('project_tools').style.visibility = 'hidden';
-                        document.getElementById('project_tools').style.display = 'none';
-                        return false
-                }
-
-                document.getElementById('project_tools').style.visibility = 'visible';
-                document.getElementById('project_tools').style.display = 'block';
-
-                var replaced_str = '';
-                var total_replaced_str = '';
-                var project_number = '';
-                var message = '已查询到i个相关结果';
-                $.each(projects_tools, function(index, item)
-                {
-                    var tools = '';
-                    var raw_str = '<div class = "panel panel-primary" >' +
-                                       '<div class = "panel-heading" style = "font-size: 14px; background-color: rgba(66, 139, 202, 0.8); border-color: rgba(66, 139, 202, 0.6);">' +
-                                           '<div class = "panel-title" style = "font-size: 12px;">project_title' +
-                                               '<a style = "float: right; visibility: visible; display: inline; vertical-align: middle; margin-left: 12px;"' +
-                                                  'href = "javascript:;" class = "unfold" id = "unfold-project_id" onclick = "doUnfold(this)">' +
-                                                  '<span class = "glyphicon glyphicon-chevron-down" style = "font-size: 16px;"></span>'  +
-                                               '</a>' +
-                                               '<a style = "float: right; visibility: hidden; display: none; vertical-align: middle; margin-left: 12px;" '+
-                                                   'href = "javascript:;" class = "callapse" id = "callapse-project_id" onclick = "doCallapse(this)">' +
-                                                   '<span class = "glyphicon glyphicon-chevron-up" style = "font-size: 16px;"></span>'  +
-                                               '</a>' +
-                                               '<a target = "_blank" style = "float: right; margin-left: 12px;" class = "edit" href = "{{url_for("project.edit_view",url = url_for("project.edit_view",id = project_id))}}">' +
-                                               '<span class = "glyphicon glyphicon-pencil" style = "font-size: 16px;"></span></a>' +
-                                            '</div>' +
-                                       '</div>' +
-                                       '<div style="visibility: hidden; display: none;" class = "post" id = project_id>' +
-                                           '<table class = "table">' +
-                                               '<thead>' +
-                                               '<tr><th>*</th><th>名称</th><th>规格尺寸</th><th>数量</th><th>备注</th>' +
-                                               '</tr>' +
-                                               '</thead>' +
-                                                   '<tbody >' +
-                                                      'tools' +
-                                                   '</tbody>' +
-                                           '</table>' +
-                                           '<div class="advise-form" style="margin-bottom: 15px;padding:10px;border-top: 1px solid rgba(66, 139, 202, 0.8);">' +
-                                               '<form action="" method="post" class="form" role="form" style="width: 80%; margin-left: auto; margin-right: auto; ">' +
-                                               '<div class="form-group  required"><label class="control-label" for="body">建议</label>' +
-                                                   '<input class="form-control" id="advise-body-project_id" name="advise-body-project_id" required="" type="text" value="">' +
-                                               '</div>' +
-                                                   '<input class="btn btn-default" id="submit-project_id" name="submit" type="submit" value="提交" onclick = "doadvise(this);return false">' +
-                                               '</form>' +
-                                           '</div>' +
-                                       '</div>'+
-                                   '</div>'
-                                   ;
-
-                    $.each(item['tools'], function (idx, itm)
+            $('button#tsbb').bind('click',function ()
+            {
+                var search = $("input[name = 'search']").val();
+                $.getJSON
+                (
+                    '/',
                     {
-                        tools = tools + itm;
-                    });
+                        search:JSON.stringify(search)
+                    },
+                    function(data)
+                    {
+                        var projects_tools = data.result.projects_tools;
 
-                     replaced_str = raw_str.replace('tools', tools);
-                     replaced_str = replaced_str.replace(/project_id/g, item['project_id']);
-                     replaced_str = replaced_str.replace('%3D', '=' + item['project_id']);
-                     replaced_str = replaced_str.replace('project_title', item['project_title']);
+                        if (projects_tools.length === 0){
+                            $('div#messages').attr('class','alert-warning');
+                            $('div#messages').text('没有相关查询结果,请尝试其他或者更多的关键词');
+                            document.getElementById('project_tools').style.visibility = 'hidden';
+                            document.getElementById('project_tools').style.display = 'none';
+                            return false
+                    }
 
-                     total_replaced_str = total_replaced_str + replaced_str;
+                    document.getElementById('project_tools').style.visibility = 'visible';
+                    document.getElementById('project_tools').style.display = 'block';
 
-                     project_number = index + 1;
-                 });
+                    var replaced_str = '';
+                    var total_replaced_str = '';
+                    var project_number = '';
+                    var message = '已查询到i个相关结果';
+                    $.each(projects_tools, function(index, item)
+                    {
+                        var tools = '';
+                        var raw_str = '<div class = "panel panel-primary" >' +
+                                           '<div class = "panel-heading" style = "font-size: 14px; background-color: rgba(66, 139, 202, 0.8); border-color: rgba(66, 139, 202, 0.6);">' +
+                                               '<div class = "panel-title" style = "font-size: 12px;">project_title' +
+                                                   '<a style = "float: right; visibility: visible; display: inline; vertical-align: middle; margin-left: 12px;"' +
+                                                      'href = "javascript:;" class = "unfold" id = "unfold-project_id" onclick = "doUnfold(this)">' +
+                                                      '<span class = "glyphicon glyphicon-chevron-down" style = "font-size: 16px;"></span>'  +
+                                                   '</a>' +
+                                                   '<a style = "float: right; visibility: hidden; display: none; vertical-align: middle; margin-left: 12px;" '+
+                                                       'href = "javascript:;" class = "callapse" id = "callapse-project_id" onclick = "doCallapse(this)">' +
+                                                       '<span class = "glyphicon glyphicon-chevron-up" style = "font-size: 16px;"></span>'  +
+                                                   '</a>' +
+                                                   '<a target = "_blank" style = "float: right; margin-left: 12px;" class = "edit" href = "{{url_for("project.edit_view",url = url_for("project.edit_view",id = project_id))}}">' +
+                                                   '<span class = "glyphicon glyphicon-pencil" style = "font-size: 16px;"></span></a>' +
+                                                '</div>' +
+                                           '</div>' +
+                                           '<div style="visibility: hidden; display: none;" class = "post" id = project_id>' +
+                                               '<table class = "table">' +
+                                                   '<thead>' +
+                                                   '<tr><th>*</th><th>名称</th><th>规格尺寸</th><th>数量</th><th>备注</th>' +
+                                                   '</tr>' +
+                                                   '</thead>' +
+                                                       '<tbody >' +
+                                                          'tools' +
+                                                       '</tbody>' +
+                                               '</table>' +
+                                               '<div class="advise-form" style="margin-bottom: 15px;padding:10px;border-top: 1px solid rgba(66, 139, 202, 0.8);">' +
+                                                   '<form action="" method="post" class="form" role="form" style="width: 80%; margin-left: auto; margin-right: auto; ">' +
+                                                   '<div class="form-group  required"><label class="control-label" for="body">建议</label>' +
+                                                       '<input class="form-control" id="advise-body-project_id" name="advise-body-project_id" required="" type="text" value="">' +
+                                                   '</div>' +
+                                                       '<input class="btn btn-default" id="submit-project_id" name="submit" type="submit" value="提交" onclick = "doadvise(this);return false">' +
+                                                   '</form>' +
+                                               '</div>' +
+                                           '</div>'+
+                                       '</div>'
+                                       ;
 
-                message = message.replace('i', project_number);
-                document.getElementById('project_tools').innerHTML=total_replaced_str;
-                document.getElementById('messages').setAttribute('class','alert-success');
-                document.getElementById('messages').innerText=message;
-                }
-            );
+                        $.each(item['tools'], function (idx, itm)
+                        {
+                            tools = tools + itm;
+                        });
+
+                        replaced_str = raw_str.replace('tools', tools);
+                        replaced_str = replaced_str.replace(/project_id/g, item['project_id']);
+                        // 替换 `href="/admin/project/edit/?url=%2Fadmin%2Fproject%2Fedit%2F%3Fid%3D"`成
+                        // `href="/admin/project/edit/?url=%2Fadmin%2Fproject%2Fedit%2F%3Fid=138"`
+                        replaced_str = replaced_str.replace('%3D', '=' + item['project_id']);
+                        console.log(replaced_str);
+                        replaced_str = replaced_str.replace('project_title', item['project_title']);
+
+                        total_replaced_str = total_replaced_str + replaced_str;
+
+                        project_number = index + 1;
+                     });
+
+                    message = message.replace('i', project_number);
+                    document.getElementById('project_tools').innerHTML=total_replaced_str;
+                    document.getElementById('messages').setAttribute('class','alert-success');
+                    document.getElementById('messages').innerText=message;
+                    }
+                );
+
+            });
 
         });
 
-    });
-    function doUnfold(obj)
-    {
-        var unfold_id = $(obj).attr('id');
-        var project_id = unfold_id.slice(7,20)
-        var callapse_id = 'callapse' + '-' + project_id;
-        document.getElementById(unfold_id).style.visibility = 'hidden';
-        document.getElementById(unfold_id).style.display = 'none';
-        document.getElementById(callapse_id).style.visibility = 'visible';
-        document.getElementById(callapse_id).style.display = 'inline';
-        $('div#project_id').slideDown('slow');
-        document.getElementById(project_id).style.visibility = 'visible';
-        document.getElementById(project_id).style.display = 'inline';
-    }
-    function doCallapse(obj)
-    {
-        var callapse_id = $(obj).attr('id');
-        var project_id = callapse_id.slice(9, 20);
-        var unfold_id = 'unfold' + '-' + project_id;
-        document.getElementById(callapse_id).style.visibility = 'hidden';
-        document.getElementById(callapse_id).style.display = 'none';
-        document.getElementById(unfold_id).style.visibility = 'visible';
-        document.getElementById(unfold_id).style.display = 'inline';
-        $('div#project_id').slideUp('slow');
-        document.getElementById(project_id).style.visibility = 'hidden';
-        document.getElementById(project_id).style.display = 'none';
-    }
-    function doadvise(obj)
-    {
-        var submit_id = $(obj).attr('id');
-        var project_id = submit_id.slice(7, 20);
-        var advise_body_id = 'advise-body' + '-' + project_id;
-        var advise = document.getElementById(advise_body_id).value;
-        $.getJSON
-        (   'advise',
-            {
-                advise:JSON.stringify("{'project_id':'"+project_id+"',"+"'name':'anonimity',"+"'advise':'"+advise+"'}")
+        function doUnfold(obj)
+        {
+            var unfold_id = $(obj).attr('id');
+            var project_id = unfold_id.slice(7,20)
+            var callapse_id = 'callapse' + '-' + project_id;
+            document.getElementById(unfold_id).style.visibility = 'hidden';
+            document.getElementById(unfold_id).style.display = 'none';
+            document.getElementById(callapse_id).style.visibility = 'visible';
+            document.getElementById(callapse_id).style.display = 'inline';
+            $('div#project_id').slideDown('slow');
+            document.getElementById(project_id).style.visibility = 'visible';
+            document.getElementById(project_id).style.display = 'inline';
+        }
 
-            },
-            function(data)
-            {
-                TODO:
+        function doCallapse(obj)
+        {
+            var callapse_id = $(obj).attr('id');
+            var project_id = callapse_id.slice(9, 20);
+            var unfold_id = 'unfold' + '-' + project_id;
+            document.getElementById(callapse_id).style.visibility = 'hidden';
+            document.getElementById(callapse_id).style.display = 'none';
+            document.getElementById(unfold_id).style.visibility = 'visible';
+            document.getElementById(unfold_id).style.display = 'inline';
+            $('div#project_id').slideUp('slow');
+            document.getElementById(project_id).style.visibility = 'hidden';
+            document.getElementById(project_id).style.display = 'none';
+        }
+
+        function doAdvise(obj)
+        {
+            var submit_id = $(obj).attr('id');
+            var project_id = submit_id.slice(7, 20);
+            var advise_body_id = 'advise-body' + '-' + project_id;
+            var advise = document.getElementById(advise_body_id).value;
+            $.getJSON
+            (   'advise',
+                {
+                    advise:JSON.stringify("{'project_id':'"+project_id+"',"+"'name':'anonimity',"+"'advise':'"+advise+"'}")
+
+                },
+                function(data)
+                {
+                    // TODO:
+                }
+            );
+        }
+        </script>
+
+        <style type = 'text/css'>
+            body#dummybodyid.srp{
+                background-color: #f2f2f2;
+                padding-top: 0px;
             }
-        );
-    }
-    </script>
-    <style type = 'text/css'>
-        body#dummybodyid.srp{
-            background-color: #f2f2f2;
-            padding-top: 0px;
-        }
 
-        div.header{
-                    height: 170px;
-                    width: 100%;
-                    position: fixed;
-                    top: 0;
-                    padding-right: 15px;
-                    padding-left: 5px;
-                    margin-right: auto;
-                    margin-left: auto;
-                    z-index: 999;
-                    background-color: #f2f2f2;
-        }
+            div.header{
+                height: 170px;
+                width: 100%;
+                position: fixed;
+                top: 0;
+                padding-right: 15px;
+                padding-left: 5px;
+                margin-right: auto;
+                margin-left: auto;
+       z-index: 998;
+                background-color: #f2f2f2;
+            }
 
-        div#admin{
-            float:right;
-            margin-top: 12px;
-            margin-right: 8px;
-            line-height: 28px;
-            padding:0 12px;
-            -moz-border-radius: 28px;
-            -webkit-border-radius: 28px;
-            border-radius: 14px;
-            background-color: #3b78e7;
-            border: 1px solid #3367d6;
-            z-index: 1000;
-            position: relative;
-        }
-        span.glyphicon-user{
-            display: inline-block;
-            color:#fff;
-        }
-        span.glyphicon-pencil{
-            display: inline-block;
-            color:#fff;
-        }
-        div#sfcn._cy{
-            padding-top: 72px;
-            margin-left: 8px;margin-right: 8px;
-            overflow: visible;position: relative;z-index: 999;
-        }
-        div.sbox{
-            max-height:999999px;
-        }
-        form#tsf{
-            text-align: left;
-            background: none;
-            border-bottom: 1px solid rgba(0,0,0,.12);
-            height: 39px;
-        }
-        div#tmsb.msb{
-            background-color: #fff;
-            border-radius: 2px;
-            display: -webkit-flex;
-            position: relative;
-            z-index: 999;
-        }
-        div.msfo{
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-flex-grow: 1;
-            padding-left: 0;
-            postition: relative;
-        }
-        div#tsfi.msfi{
-            zoom: 1;
-            position: relative;
-            -webkit-box-sizing: border-box;
-            -moz-box-sizing: border-box;
-            box-sizing: border-box;
-            width: 100%;
-            background-color: #fff !important;
-            padding: 0;
-            padding-right: 0;
-            height: 39px;
-        }
-        div#gs_id0{
-            max-height: 999999px;
-            display: block;
+            div#admin{
+                float:right;
+                margin-top: 12px;
+                margin-right: 8px;
+                line-height: 28px;
+                padding:0 12px;
+                -moz-border-radius: 28px;
+                -webkit-border-radius: 28px;
+                border-radius: 14px;
+       background-color: #2185d0;
+                border: 1px solid #3367d6;
+       z-index: 999;
+                position: relative;
+            }
 
-        }
-        div#sb_ifc0.sb-ifc{
-            padding: 7px 0;
-            display: flex;
-        }
-        div#sb-chc0.sb_chc{
-            display: -webkit-box;
-            -webkit-box-ordinal-group: 1;
-            order: 1;
-            -webkit-box-flex: 0;
-            flex:0 0 auto;
-            margin: -5px 0;
-        }
-        input.lst{
-            font-size: 16px;
-            color: rgba(0,0,0,.87);
-            line-height: 25px;
-            background-color: transparent;
-            border: none;
-            margin: 0;
-            padding: 0;
-        }
-        input#lst-ib.lst.lst-tbb.gsfi{
-            outline: none;
-            -webkit-appearance: none;
-            -webkit-tap-highlight-color: rgba(0,0,0,0);
-            display: -webkit-box;
-            -webkit-box-ordinal-group: 2;
-            order: 2;
-            -webkit-box-flex: 1;
-            flex: 1 0;
-            padding-left: 16px;
-        }
-        div#gs_st0.gsst_b{
-            display: -webkit-box;
-            -webkit-box-ordinal-group: 3;
-            order: 3;
-            -webkit-box-flex: 0;
-            flex: 0 0 28px;
-            width: 28px;
-            -webkit-user-select: none;
-            text-align: center;
-            white-space: nowrap;
-        }
-        button#tsbb.lsbb{
-            border-radius: 0;
-            padding: 0;
-            position: absolute;
-            right: 0;
-            top: 0;
-            box-sizing: border-box;
-            height: 40px;
-            width: 40px;
-            background-color: #3b78e7;
-            border: 1px solid #3367d6;
-        }
-        div.sbico{
-            display: block;
-        }
-        span._wtf{
-            display: inline-block;
-            fill: #fff;
-            height: 24px;
-            line-height: 24px;
-            position: relative;
-            width: 24px;
-        }
-        svg{
-            display: block;
-            height: 100%;
-            width: 100%;
-        }
-        div#messages{
-            margin-right: 8px;margin-left: 8px;
-        }
-        div#project_tools{
-            margin-right: 8px;
-            margin-left: 8px;
-            margin-top: 191px;
-            padding-right: 5px;
-            padding-left: 5px;
-            z-index: 1;
-        }
-    </style>
-    <style type = 'text/css'>
-        div#msc{
-            font-size: 12px;
-            text-transform: uppercase;
-            background-color: #f8f8f8;
-            border-bottom-left-radius: 2px;
-            border-bottom-right-radius: 2px;
-            height: 40px;
-            line-height: 28px;
-            overflow: hidden;
-            position: relative;
-            z-index: 999;
-        }
-        div#msd{
-            visibility: inherit !important;
-        }
-        div._zkj{
-           background: -webkit-gradient(linear,left top,right top,color-stop(0%,rgba(248,248,248,0)),color-stop(100%,rgba(248,248,248,1)));
-            height: 40px;
-            position: absolute;
-            pointer-events: none;
-            right: 0;
-            top: 0;
-            width: 24px;
-            z-index: 999;
-            display: block;
-        }
-        div#hdtb-sc{
-            opacity: 1;
-            -webkit-user-select: none;
-            height: 51px;
-            overflow-y: hidden;
-            padding: 0;
-            position: relative;
-            overflow-x: scroll;
-            display: block;
-        }
-        div#hdtb-msb{
-            padding-right: 8px;
-            position: relative;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-        div.hdtb-mitem.hdtb-imb{
-            display: inline-block;
-            line-height: 40px;
-            height: 40px;
-            margin: 0;
-            padding: 0px 16px;
-            text-align: center;
-            background-color: #f8f8f8;
-        }
-        div.hdtb-msel{
-    line-height: 40px;
-    height: 40px;
-    margin: 0;
-    padding: 0px 16px;
-    text-align: center;
-    background-color: #f8f8f8;
-            display: inline-block;
-            border-bottom: 2px solid #4285f4;
-            box-sizing: border-box;
-            -webkit-box-sizing: border-box;
-            color: #4285f4;
-        }
-        a.q.qs{
-            font-family: Roboto-Medium,Roboto-Regular,Roboto-Medium,HelveticaNeue-Medium,HelveticaNeue,sans-serif-medium,Arial,sans-serif !important;
-            display: inline-block;
-            color: rgba(0,0,0,0.54);
-            text-decoration: none;
-        }
-        a:visited{
-            color: #609;
-        }
-    </style>
-</head>
+            span.glyphicon-user{
+                display: inline-block;
+                color:#fff;
+            }
+
+            span.glyphicon-pencil{
+                display: inline-block;
+                color:#fff;
+            }
+
+            div#sfcn._cy{
+                padding-top: 72px;
+                margin-left: 8px;
+                margin-right: 8px;
+                overflow: visible;
+                position: relative;
+       z-index: 998;
+            }
+
+            div.sbox{
+                max-height:999999px;
+            }
+
+            form#tsf{
+                text-align: left;
+                background: none;
+                border-bottom: 1px solid rgba(0,0,0,.12);
+                height: 39px;
+            }
+
+            div#tmsb.msb{
+                background-color: #fff;
+                border-radius: 2px;
+                display: -webkit-flex;
+                position: relative;
+       z-index: 998;
+            }
+
+            div.msfo{
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-flex-grow: 1;
+                padding-left: 0;
+                postition: relative;
+            }
+
+            div#tsfi.msfi{
+                zoom: 1;
+                position: relative;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+                width: 100%;
+                background-color: #fff !important;
+                padding: 0;
+                padding-right: 0;
+                height: 39px;
+            }
+
+            div#gs_id0{
+                max-height: 999999px;
+                display: block;
+            }
+
+            div#sb_ifc0.sb-ifc{
+                padding: 7px 0;
+                display: flex;
+            }
+            div#sb-chc0.sb_chc{
+                display: -webkit-box;
+                -webkit-box-ordinal-group: 1;
+                order: 1;
+                -webkit-box-flex: 0;
+                flex:0 0 auto;
+                margin: -5px 0;
+            }
+
+            input.lst{
+                font-size: 16px;
+                color: rgba(0,0,0,.87);
+                line-height: 25px;
+                background-color: transparent;
+                border: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            input#lst-ib.lst.lst-tbb.gsfi{
+                outline: none;
+                -webkit-appearance: none;
+                -webkit-tap-highlight-color: rgba(0,0,0,0);
+                display: -webkit-box;
+                -webkit-box-ordinal-group: 2;
+                order: 2;
+                -webkit-box-flex: 1;
+                flex: 1 0;
+                padding-left: 16px;
+            }
+
+            div#gs_st0.gsst_b{
+                display: -webkit-box;
+                -webkit-box-ordinal-group: 3;
+                order: 3;
+                -webkit-box-flex: 0;
+                flex: 0 0 28px;
+                width: 28px;
+                -webkit-user-select: none;
+                text-align: center;
+                white-space: nowrap;
+            }
+
+            button#tsbb.lsbb{
+                border-radius: 0;
+                padding: 0;
+                position: absolute;
+                right: 0;
+                top: 0;
+                box-sizing: border-box;
+                height: 40px;
+                width: 40px;
+                background-color: #3b78e7;
+                border: 1px solid #3367d6;
+            }
+
+            div.sbico{
+                display: block;
+            }
+
+            span._wtf{
+                display: inline-block;
+                fill: #fff;
+                height: 24px;
+                line-height: 24px;
+                position: relative;
+                width: 24px;
+            }
+
+            svg{
+                display: block;
+                height: 100%;
+                width: 100%;
+            }
+
+            div#messages{
+                margin-right: 8px;
+                margin-left: 8px;
+            }
+
+            div#project_tools{
+                margin-right: 8px;
+                margin-left: 8px;
+                margin-top: 191px;
+                padding-right: 5px;
+                padding-left: 5px;
+                z-index: 1;
+            }
+
+     div#search{
+       z-index: 1000;
+     }
+        </style>
+
+        <style type = 'text/css'>
+            div#msc{
+                font-size: 12px;
+                text-transform: uppercase;
+                background-color: #f8f8f8;
+                border-bottom-left-radius: 2px;
+                border-bottom-right-radius: 2px;
+                height: 40px;
+                line-height: 28px;
+                overflow: hidden;
+                position: relative;
+       z-index: 998;
+            }
+
+            div#msd{
+                visibility: inherit !important;
+            }
+
+            div._zkj{
+               background: -webkit-gradient(linear,left top,right top,color-stop(0%,rgba(248,248,248,0)),color-stop(100%,rgba(248,248,248,1)));
+                height: 40px;
+                position: absolute;
+                pointer-events: none;
+                right: 0;
+                top: 0;
+                width: 24px;
+       z-index: 998;
+                display: block;
+            }
+
+            div#hdtb-sc{
+                opacity: 1;
+                -webkit-user-select: none;
+                height: 51px;
+                overflow-y: hidden;
+                padding: 0;
+                position: relative;
+                overflow-x: scroll;
+                display: block;
+            }
+
+            div#hdtb-msb{
+                padding-right: 8px;
+                position: relative;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+
+            div.hdtb-mitem.hdtb-imb{
+                display: inline-block;
+                line-height: 40px;
+                height: 40px;
+                margin: 0;
+                padding: 0px 16px;
+                text-align: center;
+                background-color: #f8f8f8;
+            }
+
+            div.hdtb-msel{
+                line-height: 40px;
+                height: 40px;
+                margin: 0;
+                padding: 0px 16px;
+                text-align: center;
+                background-color: #f8f8f8;
+                display: inline-block;
+                border-bottom: 2px solid #4285f4;
+                box-sizing: border-box;
+                -webkit-box-sizing: border-box;
+                color: #4285f4;
+            }
+
+            a.q.qs{
+                font-family: Roboto-Medium,Roboto-Regular,Roboto-Medium,HelveticaNeue-Medium,HelveticaNeue,sans-serif-medium,Arial,sans-serif !important;
+                display: inline-block;
+                color: rgba(0,0,0,0.54);
+                text-decoration: none;
+            }
+
+            a:visited{
+                color: #609;
+            }
+        </style>
+    </head>
     <div class= 'contain' style='padding-left: 5px;padding-right: 5px; '>
         <body class = 'srp' id = 'dummybodyid'>
             <div class = 'header'>
@@ -400,51 +442,51 @@
                     <a target = '_blank' href = "{{url_for('admin.index')}}" class = 'admin'><span class = 'glyphicon glyphicon-user'></span></a>
                 </div>
                 <div id = 'sfcn' class = '_cy'>
-                <div class = 'sbox'>
-                    <form style = 'background: none;' id = 'tsf' method = 'get' role = 'search'>
-                        <div class = 'msb' id = 'tmsb'>
-                            <div class = 'msfo'>
-                            <div class = 'msfi' id = 'tsfi'>
-                                <div id ='gs_id0'>
-                                    <div class = 'sb-ifc' id = 'sb_ifc0' dir = 'ltr'>
-                                        <div class ='sb_chc' id = 'sb-chc0'></div>
-                                        <input class = 'lst lst-tbb gsfi' id = 'lst-ib' name = 'search'>
-                                        <div class = 'gsst_b' id = 'gs_st0' dir = 'ltr'>
-                                            <a class = 'gsst_a' href = 'javascript : void(0)' style = 'visibility : hidden;'></a>
-                                        </div>
+                    <div class = 'sbox'>
+                        <form style = 'background: none;' id = 'tsf' method = 'get' role = 'search'>
+                            <div class = 'msb' id = 'tmsb'>
+                              <div class='msfo'>
+                                <div class='msfi' id='tsfi'>
+                                  <div id='gs_id0'>
+                                    <div class='sb-ifc' id='sb_ifc0' dir='ltr'>
+                                            <div class ='sb_chc' id = 'sb-chc0'></div>
+                                      <input class='lst lst-tbb gsfi' id='lst-ib' name='search'>
+                                      <div class='gsst_b' id='gs_st0' dir='ltr'>
+                                                <a class = 'gsst_a' href = 'javascript : void(0)' style = 'visibility : hidden;'></a>
+                                      </div>
                                     </div>
+                                  </div>
                                 </div>
+                              </div>
+                              <button class="lsbb" aria-label="搜索" id="tsbb" name="btng" type="submit" onclick = 'return false'>
+                                  <div class="sbico">
+                                      <span class="_wtf _Qtf">
+                                          <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
+                                      </span>
+                                  </div>
+                              </button>
                             </div>
-                        </div>
-                            <button class="lsbb" aria-label="搜索" id="tsbb" name="btng" type="submit" onclick = 'return false'>
-                                <div class="sbico">
-                                    <span class="_wtf _Qtf">
-                                        <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
-                                    </span>
-                                </div>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                <div data-jiis = 'cc' id = 'msc'>
-                    <div data-jibp = 'h' data-jiis = 'uc' id = 'msd'>
-                        <div class = '_zkj'></div>
-                        <div data-pr = 'c' id = 'hdtb-sc' jsaction = 'tnv.msc' style = 'opacity : 1'>
-                            <div id = 'hdtb-msb'>
-                                <div class = 'hdtb-msel'>工具</div>
-                                <div class = 'hdtb-mitem hdtb-imb'>
-                                    <a class = "q qs" href = "{{url_for('documents.post')}}">文档</a>
-                                </div>
-                                <div class = 'hdtb-mitem hdtb-imb'>
-                                  <a class = "q qs" href = "http://182.61.145.178:3000/dataEntry">工时录入</a>
+                        </form>
+                    </div>
+                    <div data-jiis = 'cc' id = 'msc'>
+                        <div data-jibp = 'h' data-jiis = 'uc' id = 'msd'>
+                            <div class = '_zkj'></div>
+                            <div data-pr = 'c' id = 'hdtb-sc' jsaction = 'tnv.msc' style = 'opacity : 1'>
+                                <div id = 'hdtb-msb'>
+                                    <div class = 'hdtb-msel'>工具</div>
+                                    <div class = 'hdtb-mitem hdtb-imb'>
+                                        <a class = "q qs" href = "{{url_for('documents.post')}}">文档</a>
+                                    </div>
+                                    <div class = 'hdtb-mitem hdtb-imb'>
+                                      <a class = "q qs" href = "http://182.61.145.178:3000/dataEntry">工时录入</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div id = 'messages' style = 'margin-bottom: 15px;' >
-            </div>
+                <div id = 'messages' style = 'margin-bottom: 15px;' >
+                </div>
             </div>
             <div id = 'project_tools' >
             </div>

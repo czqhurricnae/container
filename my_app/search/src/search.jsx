@@ -4,6 +4,8 @@ import { Search, Label } from 'semantic-ui-react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
 
+import $ from 'jquery'
+
 const resultRenderer = ({ title }) => <Label content={title} />
 
 resultRenderer.propTypes = {
@@ -15,11 +17,21 @@ const initialState = { isloading: false, results: [], value: '', open: false,
   segmentations: [] }
 
 class MySearch extends React.Component {
-  state = initialState
+    state = initialState;
+
+    componentDidMount () {
+        $('button.ui.icon.primary.button').off();
+    }
 
   handleResultSelect = (e, { result }) => {
-    this.setState({ value: result.title, open: false, })
-    this.setSelected(result.title)
+      this.setState({ value: result.title, open: false, });
+      this.setSelected(result.title);
+      $(function () {
+          document.getElementById('msc')
+              .style.visibility = 'visible'
+          document.getElementById('msc')
+              .style.display = 'block'
+      });
   }
 
   handleSearchChange = (e, { value }) => {
@@ -42,6 +54,15 @@ class MySearch extends React.Component {
         open: Boolean(value.length)
       })
 
+        if (this.state.open) {
+            $(function () {
+                document.getElementById('msc')
+                    .style.visibility = 'hidden'
+                document.getElementById('msc')
+                    .style.display = 'none'
+            });
+        }
+
     }, 500)
 
     this.setSelected(value)
@@ -53,10 +74,24 @@ class MySearch extends React.Component {
       open = _.includes(e.relatedTarget.classList, 'result');
     }
     this.setState({ open: open, focused: false, });
+      if (this.state.open) {
+          $(function () {
+              document.getElementById('msc')
+                  .style.visibility = 'hidden'
+              document.getElementById('msc')
+                  .style.display = 'none'
+          });
+      }
   }
 
   handleFocusSearch = (e) => {
     this.setState({ open: true, focused: true, });
+    $(function () {
+      document.getElementById('msc')
+        .style.visibility = 'hidden'
+      document.getElementById('msc')
+        .style.display = 'none'
+    });
   }
 
   handleSegment = (search) => {

@@ -1,10 +1,8 @@
 import React from 'react'
 import { formShape } from 'rc-form'
 import createForm from 'rc-form/lib/createDOMForm'
-import { Segment, Grid, Form, Button } from 'semantic-ui-react'
+import { Segment, Grid, Form, Button, Icon } from 'semantic-ui-react'
 import Search from './search.jsx'
-
-import './style.css'
 
 const datasheet = {}
 
@@ -30,6 +28,7 @@ class OriginApp extends React.Component {
             if (responseJson) {
               const source = responseJson.map((item, index, array) => {
                 item.tabIndex = '0'
+                item.style = {'z-index': '1000'}
                 return item
               })
               this.setState({ source })
@@ -44,6 +43,18 @@ class OriginApp extends React.Component {
             console.log(error)
           })
       })
+  }
+
+  handleSearch = (event) => {
+    event.preventDefault();
+
+    this.props.form.validateFieldsAndScroll((error, values) => {
+      if (!error) {
+        // Query(values.selected);
+      } else {
+        console.log('error', error, values);
+      }
+    });
   }
 
   render () {
@@ -63,8 +74,11 @@ class OriginApp extends React.Component {
                    {...this.props}
                    {...this.state}
                    fluid
-                   icon={<Button primary icon='search'></Button>}
+                   icon={<div id={'sicon'}></div>}
               />)}
+              <div style={{ color: 'red' }}>
+                {(getFieldError('selected') || []).join(', ')}
+              </div>
             </Grid.Column>
           </Grid>
         </Form.Field>
@@ -72,7 +86,6 @@ class OriginApp extends React.Component {
     )
   }
 }
-
 const App = createForm({
   onFieldsChange (_, changedFields, allFields) {
     console.log('onFieldsChange: ', changedFields, allFields)

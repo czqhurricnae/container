@@ -20,9 +20,8 @@ def hello():
             if len(projects) != 0:
                 ars_list.append(projects)
         try:
-            projects_set = reduce(
-                lambda x, y: set(x).intersection(
-                    set(y)), ars_list)
+            projects_set = reduce(lambda x, y: set(x).intersection(set(y)),
+                                  ars_list)
         except TypeError:
             projects_set = []
 
@@ -49,7 +48,8 @@ def hello():
 def advise():
     advises = dict()
     if request.is_xhr:
-        new_advise_str = request.args.get('advise').strip('"').replace("'","\"")
+        new_advise_str = request.args.get('advise').strip('"').replace(
+            "'", "\"")
         new_advise = json.loads(new_advise_str)
         if new_advise['advise'] != '':
             from ..models import Advise, db
