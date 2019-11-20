@@ -32,7 +32,6 @@ class Scrapper:
                     temp = t.split(' ')[-1]
                     result = temp.replace('·', '')
                 except Exception as e:
-                    print(e)
                 result_list.append(result)
                 wf.write(result)
                 wf.write('\n')
@@ -59,7 +58,6 @@ class Scrapper:
         for item in url_set:
             url_txt.write(item)
             url_txt.write('\n')
-        print(len(url_list), len(title_list))
         return list(url_set)
 
     def get_tool(self, urls):
@@ -106,7 +104,6 @@ class Scrapper:
             except Exception as e:
                 print('Pattern search go wrong,{0}:{1}'.format(
                     type(e).__name__, e))
-                print(url)
             raw_str = bs_obj.findAll('tr', {'class': 'ng-scope'})
             tool_list = [item.text.split('\n')[1:-1] for item in raw_str]
             projec_tools = Project_tools(model + title, model, chapter,
