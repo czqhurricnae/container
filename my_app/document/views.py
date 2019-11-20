@@ -3,6 +3,7 @@ from my_app.document import documents_blueprint as documents
 import jieba
 from functools import reduce
 
+
 @documents.route('/document/', methods=['GET', 'POST'])
 def post():
     if request.is_xhr:
@@ -15,9 +16,8 @@ def post():
             if len(documents) != 0:
                 ars_list.append(documents)
         try:
-            document_set = reduce(
-                lambda x, y: set(x).intersection(
-                    set(y)), ars_list)
+            document_set = reduce(lambda x, y: set(x).intersection(set(y)),
+                                  ars_list)
         except TypeError:
             document_set = []
 
@@ -43,13 +43,11 @@ def post():
 @documents.route('/document/<title>', methods=['GET', 'POST'])
 def document_by_title(title):
     query = title
-    print(query)
     from ..models import Document
     documents = Document.query.filter_by(title=query).all()
-    print documents
     return render_template('document_by_title.html')
 
 
 @documents.app_template_filter('change')
 def change(string):
-    return(string.replace('\\', '/'))
+    return (string.replace('\\', '/'))

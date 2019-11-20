@@ -29,14 +29,14 @@ def hello():
         result[u'projects_tools'] = []
         if len(projects_set) != 0:
             for project in projects_set:
-                project_tool = dict()
-                project_tool[u'project_id'] = project.id
-                project_tool[u'project_title'] = project.title
-                project_tool[u'tools'] = []
+                project_tools = dict()
+                project_tools[u'project_id'] = project.id
+                project_tools[u'project_title'] = project.title
+                project_tools[u'tools'] = []
                 tools = Tool.query.filter_by(project_id=project.id).all()
                 for tool in tools:
-                    project_tool[u'tools'].append(tool.to_html)
-                result[u'projects_tools'].append(project_tool)
+                    project_tools[u'tools'].append(tool.to_html)
+                result[u'projects_tools'].append(project_tools)
             if len(result[u'projects_tools']):
                 return jsonify(result=result)
         else:

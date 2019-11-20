@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 from flask_restful import Resource, fields, marshal_with, marshal, reqparse
 from models import Project, Tool
 import jieba
@@ -5,6 +6,7 @@ import json
 
 projects_resource_fields = {
     'title': fields.String,
+    'id': fields.Integer,
 }
 
 tools_resource_fields = {
@@ -20,19 +22,9 @@ parser.add_argument('search')
 
 class ProjectsAPI(Resource):
     @marshal_with(projects_resource_fields)
-    def get(self, **kwargs):
+    def get(self):
         return [project for project in Project.query.all()]
 
-
-class SegmentationAPI(Resource):
-    def post(self):
-        args = parser.parse_args()
-        search = args.get('search', '')
-        seg_list = jieba.cut(sentence=search)
-        return [seg for seg in seg_list]
-
-
-class ToolsAPI(Resource):
     def post(self):
         args = parser.parse_args()
         search = args.get('search', '')
@@ -52,13 +44,36 @@ class ToolsAPI(Resource):
 
         if len(projects_set) != 0:
             for project in projects_set:
-                project_tool = dict()
-                project_tool[u'project_id'] = project.id
-                project_tool[u'project_title'] = project.title
-                project_tool[u'tools'] = []
                 tools = Tool.query.filter_by(project_id=project.id).all()
-                for tool in tools:
-                    project_tool[u'tools'].append(
-                        marshal(vars(tool), tools_resource_fields))
-                results.append(project_tool)
+                project_tools = dict()
+                project_tools[u'project_id'] = project.id
+                project_tools[u'project_title'] = project.title
+                project_tools[u'tools'] = [
+                    marshal(tool, tools_resource_fields) for tool in tools
+                ]
+                results.append(project_tools)
         return results
+
+
+class SegmentationAPI(Resource):
+    def post(self):
+        args = parser.parse_args()
+        search = args.get('search', '')
+        if not (search):
+            return []
+        else:
+            seg_list = jieba.cut(sentence=search)
+            return [seg for seg in seg_list]
+
+
+class ToolsAPI(Resource):
+    def get(self, project_id):
+        project_tools = dict()
+        project = Project.query.filter_by(id=project_id).first()
+        project_tools[u'project_id'] = project.id
+        project_tools[u'project_title'] = project.title
+        project_tools[u'tools'] = [
+            marshal(tool, tools_resource_fields)
+            for tool in project.the_tools.all()
+        ]
+        return [project_tools]

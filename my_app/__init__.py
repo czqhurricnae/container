@@ -110,7 +110,7 @@ def create_app():
     api = Api(app)
     api.add_resource(ProjectsAPI, '/api/projects/')
     api.add_resource(SegmentationAPI, '/api/segmentations/')
-    api.add_resource(ToolsAPI, '/api/tools/')
+    api.add_resource(ToolsAPI, '/api/tools/<int:project_id>')
     return app
 
 
