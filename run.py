@@ -16,18 +16,18 @@ manager = Manager(app)
 
 
 def _make_context():
-    return dict(
-        app=app,
-        db=db,
-        Tool=Tool,
-        Project=Project,
-        Document=Document,
-        Advise=Advise)
+    return dict(app=app,
+                db=db,
+                Tool=Tool,
+                Project=Project,
+                Document=Document,
+                Advise=Advise)
+
+
 manager.add_command('shell', Shell(make_context=_make_context))
 manager.add_command('db', MigrateCommand)
 whoosh_index(app, Project)
 whoosh_index(app, Document)
-
 
 if __name__ == '__main__':
     manager.run()

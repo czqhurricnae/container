@@ -1,5 +1,4 @@
 # -*- coding:utf-8 -*-
-
 from . import index_blueprint as index
 from flask import render_template, jsonify, request
 import jieba
@@ -11,8 +10,9 @@ import ast
 @index.route('/', methods=['GET', 'POST'])
 def hello():
     if request.is_xhr:
-        search = request.args.get('search')
         from ..models import Project, Tool
+
+        search = request.args.get('search', '')
         seg_list = jieba.cut(sentence=search)
         ars_list = []
         for seg in seg_list:
@@ -35,7 +35,7 @@ def hello():
                 project_tool[u'tools'] = []
                 tools = Tool.query.filter_by(project_id=project.id).all()
                 for tool in tools:
-                    project_tool[u'tools'].append(tool.to_json)
+                    project_tool[u'tools'].append(tool.to_html)
                 result[u'projects_tools'].append(project_tool)
             if len(result[u'projects_tools']):
                 return jsonify(result=result)
