@@ -24,7 +24,7 @@ class Tool(db.Model):
         return u'<Tool {0:s}>'.format(self.name)
 
     @property
-    def to_json(self):
+    def to_html(self):
         return u"<tr><th><span class='glyphicon glyphicon-wrench' aria-hidden='true'>" \
                u"</span></th><th>{0}</th><th>{1}</th><th>{2}</th><th>{3}</th></tr>"\
             .format(self.name, self.size, self.number, self.description)
