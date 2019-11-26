@@ -25,26 +25,24 @@ import MySQLdb
 """
 """
 Must have a circular import between `my_app/__init__.py` and `my_app/index/views.py`,or it could show error
-'Not Found
-
-The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.'
+`Not Found The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.`
 in the browser.
 
 `import my_app.index.views`
 
-To avoid the circular import, we choose to use the `blueprint`
+To avoid the circular import, we choose to use the `blueprint`.
 """
-""""
-The definition is `def register_blueprint(self, blueprint, **options)`
+"""
+The definition is `def register_blueprint(self, blueprint, **options)`.
 
-1. The value of parameter`blueprint` in the definition can not be a `str`
-for instance, `app.register_blueprint('index')` may cause error:`AttributeError: 'str' object has no attribute 'name'`
+1. The value of parameter`blueprint` in the definition can not be a `str` for instance,
+`app.register_blueprint('index')` may cause error:`AttributeError: 'str' object has no attribute 'name'`.
 
-2. First initialize a blueprint in `my_app/hello/views.py`, then import the blueprint through `from my_app.hello.views import index`
+2. First initialize a blueprint in `my_app/hello/views.py`, then import the blueprint through `from my_app.hello.views import index`.
 
-3. Second insert the blueprint `index` that we just create in `my_app/hello/views.py` into the blueprints through 'app.register_blueprint(index)'
+3. Second insert the blueprint `index` that we just create in `my_app/hello/views.py` into the blueprints through 'app.register_blueprint(index)'.
 
-4. The name of blueprint you import here can not the same as any function name where the blueprint imported from, or will cause an error:`AttributeError: 'function' object has no attribute 'name'`
+4. The name of blueprint you import here can not the same as any function name where the blueprint imported from, or will cause an error:`AttributeError: 'function' object has no attribute 'name'`.
 """
 
 db = SQLAlchemy()
@@ -59,7 +57,7 @@ def create_app():
     from .administ import admin_blueprint
     from .document import documents_blueprint
     from models import Tool, Project, Advise, Document, ProjectModelView, ToolModelView, DocumentModelView
-    from apis import ProjectsAPI, SegmentationAPI, ToolsAPI
+    from apis import ProjectsAPI, SegmentationAPI, ToolsAPI, Code2sessionAPI, UserInfoAPI
     app = Flask(__name__,
                 instance_path=INSTANCE_PATH,
                 static_folder=STATIC_PATH,
@@ -70,23 +68,29 @@ def create_app():
     if environ.get('app_name') == None:
         pass
     else:
-        mysql_db = MySQLdb.connect(host = 'localhost',user = 'root',passwd = 'c')
+        mysql_db = MySQLdb.connect(host='localhost',user='root',passwd='c')
         cursor = mysql_db.cursor()
-        sql = 'CREATE DATABASE IF NOT EXISTS app_tool ;'
+        sql = 'CREATE DATABASE IF NOT EXISTS app_tool;'
         cursor.execute(sql)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://%s:%s@%s:%s/%s' \
-                                            %(sae.const.MYSQL_USER,sae.const.MYSQL_PASS, \
-                                              sae.const.MYSQL_HOST, int(sae.const.MYSQL_PORT), sae.const.MYSQL_DB)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://%s:%s@%s:%s/%s' %( \
+                                               sae.const.MYSQL_USER, \
+                                               sae.const.MYSQL_PASS, \
+                                               sae.const.MYSQL_HOST, \
+                                               int(sae.const.MYSQL_PORT), \
+                                               sae.const.MYSQL_DB)
     """
     app.config['SQLALCHEMY_DATABASE_URI'] = r'sqlite:///{}'.format(
         DATABASE_PATH)
     app.config['WHOOSH_BASE'] = '{}/whoosh'.format(BASE_URL)
     app.config['WHOOSH_DISABLED'] = False
     app.config.update(RESTFUL_JSON=dict(ensure_ascii=False))
+
     app.register_blueprint(index_blueprint)
     app.register_blueprint(admin_blueprint)
     app.register_blueprint(documents_blueprint)
+
     db.init_app(app)
+
     with app.app_context():
         db.create_all()
     container_whooshalchemyplus.init_app(app)
@@ -97,7 +101,7 @@ def create_app():
         ToolModelView(model=Tool, session=db.session, name=u'拆装工具清单'))
     admin.add_view(
         DocumentModelView(model=Document, session=db.session, name=u'文档清单'))
-    # admin.add_view(FileAdmin(base_path= UPLOAD_PATH, name = u'本地文件'))
+    # admin.add_view(FileAdmin(base_path=UPLOAD_PATH, name=u'本地文件'))
     admin.add_view(
         OSSFileAdmin(access_key='2zdr2JCTOpn9viiK',
                      secret_key='2EnOtEoK90ycVpmjUn4BHVYYy5zmzx',
@@ -111,6 +115,8 @@ def create_app():
     api.add_resource(ProjectsAPI, '/api/projects/')
     api.add_resource(SegmentationAPI, '/api/segmentations/')
     api.add_resource(ToolsAPI, '/api/tools/<int:project_id>')
+    api.add_resource(Code2sessionAPI, '/api/code2session/')
+    api.add_resource(UserInfoAPI, '/api/userInfo/')
     return app
 
 

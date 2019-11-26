@@ -1,5 +1,8 @@
 # -*- coding:utf-8 -*-
-from flask_restful import Resource, fields, marshal_with, marshal, reqparse
+from flask_restful import Resource, fields, marshal_with, marshal, reqparse, current_app
+from flask import jsonify
+from weixin import WXAPPAPI
+from WXBizDataCrypt import WXBizDataCrypt
 from models import Project, Tool
 import jieba
 import json
@@ -18,6 +21,10 @@ tools_resource_fields = {
 
 parser = reqparse.RequestParser()
 parser.add_argument('search')
+parser.add_argument('code', type=str, help='code must be a string.')
+parser.add_argument('session_key', type=str, help='code must be a string.')
+parser.add_argument('encrypted_data', type=str, help='code must be a string.')
+parser.add_argument('iv', type=str, help='code must be a string.')
 
 
 class ProjectsAPI(Resource):
@@ -77,3 +84,35 @@ class ToolsAPI(Resource):
             for tool in project.the_tools.all()
         ]
         return [project_tools]
+
+
+class Code2sessionAPI(Resource):
+    def post(self):
+        APP_ID = current_app.config.get('APP_ID')
+        APP_SECRET = current_app.config.get('APP_SECRET')
+        wx_api = WXAPPAPI(appid=APP_ID, app_secret=APP_SECRET)
+
+        args = parser.parse_args()
+        code = args.get('code', None)
+
+        if code:
+            session_info = wx_api.exchange_code_for_session_key(code=code)
+            session_key = session_info.get('session_key')
+            return jsonify(session_key)
+        else:
+            return jsonify({'error': 'No code!!!'})
+
+
+class UserInfoAPI(Resource):
+    def post(self):
+        args = parser.parse_args()
+
+        APP_ID = current_app.config.get('APP_ID')
+        session_key = args.get('session_key', None)
+        encrypted_data = args.get('encrypted_data', None)
+        iv = args.get('iv', None)
+
+        if APP_ID and session_key and encrypted_data and iv:
+            crypt = WXBizDataCrypt(APP_ID, session_key)
+            user_info = crypt.decrypt(encrypted_data, iv)
+            return jsonify(user_info)
