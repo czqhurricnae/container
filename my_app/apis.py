@@ -2,7 +2,7 @@
 from flask_restful import Resource, fields, marshal_with, marshal, reqparse, current_app
 from flask import jsonify
 from weixin import WXAPPAPI
-from WXBizDataCrypt import WXBizDataCrypt
+from .WXBizDataCrypt import WXBizDataCrypt
 from models import Project, Tool
 import jieba
 import json
