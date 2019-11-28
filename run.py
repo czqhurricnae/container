@@ -6,7 +6,7 @@ from flask_migrate import MigrateCommand, Migrate
 from container_whooshalchemyplus import whoosh_index
 from my_app import create_app, db
 from my_app.models import Tool, Project, Document, Advise
-#from my_app.scrapper import Scrapper
+# from my_app.scrapper import Scrapper
 from flask_script import Shell, Manager
 import jieba
 jieba.load_userdict('userdict.txt')
@@ -31,3 +31,4 @@ whoosh_index(app, Document)
 
 if __name__ == '__main__':
     manager.run()
+    # app.run()

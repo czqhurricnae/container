@@ -115,4 +115,5 @@ class UserInfoAPI(Resource):
         if APP_ID and session_key and encrypted_data and iv:
             crypt = WXBizDataCrypt(APP_ID, session_key)
             user_info = crypt.decrypt(encrypted_data, iv)
+            user_info.update(login=True)
             return jsonify(user_info)
