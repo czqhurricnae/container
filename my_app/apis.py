@@ -3,7 +3,7 @@ from flask_restful import Resource, fields, marshal_with, marshal, reqparse, cur
 from flask import jsonify
 from weixin import WXAPPAPI
 from WXBizDataCrypt import WXBizDataCrypt
-from models import Project, Tool
+from models import Project, Tool, Document
 import jieba
 import json
 
@@ -17,6 +17,11 @@ tools_resource_fields = {
     'size': fields.String,
     'number': fields.Integer,
     'description': fields.String,
+}
+
+documents_resource_fields = {
+    'title': fields.String,
+    'id': fields.Integer,
 }
 
 parser = reqparse.RequestParser()
@@ -62,7 +67,7 @@ class ProjectsAPI(Resource):
         return results
 
 
-class SegmentationAPI(Resource):
+class segmentationsAPI(Resource):
     def post(self):
         args = parser.parse_args()
         search = args.get('search', '')
@@ -117,3 +122,53 @@ class UserInfoAPI(Resource):
             user_info = crypt.decrypt(encrypted_data, iv)
             user_info.update(login=True)
             return jsonify(user_info)
+
+
+class DocumentListAPI(Resource):
+    @marshal_with(documents_resource_fields)
+    def get(self):
+        return [document for document in Document.query.all()]
+
+    def post(self):
+        args = parser.parse_args()
+        search = args.get('search', '')
+        seg_list = jieba.cut(sentence=search)
+        ars_list = []
+        for seg in seg_list:
+            documents = Document.query.whoosh_search(seg, or_=True).all()
+            if len(documents) != 0:
+                ars_list.append(documents)
+        try:
+            document_set = reduce(lambda x, y: set(x).intersection(set(y)),
+                                  ars_list)
+        except TypeError:
+            document_set = []
+
+        results = []
+
+        if len(document_set) != 0:
+            for document in document_set:
+                meta_information = dict()
+                meta_information[u'id'] = document.id
+                meta_information[u'title'] = document.title
+                meta_information[u'office'] = document.office
+                meta_information[u'model'] = document.model
+                meta_information[u'chapter'] = document.chapter
+                meta_information[u'date'] = document.date
+                meta_information[u'get_url'] = document.get_url
+                results.append(meta_information)
+        return results
+
+
+class DocumentAPI(Resource):
+    def get(self, document_id):
+        result = dict()
+        document = Document.query.filter_by(id=document_id).first()
+        result[u'id'] = document.id
+        result[u'title'] = document.title
+        result[u'office'] = document.office
+        result[u'model'] = document.model
+        result[u'chapter'] = document.chapter
+        result[u'date'] = document.date
+        result[u'get_url'] = document.get_url
+        return [result]

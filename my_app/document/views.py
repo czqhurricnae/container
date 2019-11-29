@@ -23,6 +23,7 @@ def post():
 
         result = {}
         result[u'documents'] = []
+
         if len(document_set) != 0:
             for document in document_set:
                 meta_information = dict()

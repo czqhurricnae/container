@@ -57,7 +57,7 @@ def create_app():
     from .administ import admin_blueprint
     from .document import documents_blueprint
     from models import Tool, Project, Advise, Document, ProjectModelView, ToolModelView, DocumentModelView
-    from apis import ProjectsAPI, SegmentationAPI, ToolsAPI, Code2sessionAPI, UserInfoAPI
+    from apis import ProjectsAPI, segmentationsAPI, ToolsAPI, Code2sessionAPI, UserInfoAPI, DocumentListAPI, DocumentAPI
     app = Flask(__name__,
                 instance_path=INSTANCE_PATH,
                 static_folder=STATIC_PATH,
@@ -112,11 +112,13 @@ def create_app():
     bootstrap.init_app(app)
     # toolbar.init_app(app)
     api = Api(app)
-    api.add_resource(ProjectsAPI, '/api/projects/')
-    api.add_resource(SegmentationAPI, '/api/segmentations/')
+    api.add_resource(ProjectsAPI, '/api/projects')
+    api.add_resource(segmentationsAPI, '/api/segmentations')
     api.add_resource(ToolsAPI, '/api/tools/<int:project_id>')
-    api.add_resource(Code2sessionAPI, '/api/code2session/')
-    api.add_resource(UserInfoAPI, '/api/userInfo/')
+    api.add_resource(Code2sessionAPI, '/api/code2session')
+    api.add_resource(UserInfoAPI, '/api/userInfo')
+    api.add_resource(DocumentListAPI, '/api/documents')
+    api.add_resource(DocumentAPI, '/api/documents/<document_id>/')
     return app
 
 
