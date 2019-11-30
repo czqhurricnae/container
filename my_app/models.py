@@ -136,7 +136,7 @@ class ProjectModelView(ModelView):
     def render(self, template, **kwargs):
         """
         using extra_js in render method allow use
-        'url_for' that itselt requires an app context.
+        'url_for' that itself requires an app context.
         """
         self.extra_js = [url_for('static', filename='js/enhance.js')]
         return super(ProjectModelView, self).render(template, **kwargs)
@@ -155,12 +155,13 @@ class ToolModelView(ModelView):
     ]
     column_searchable_list = ('project_title', )
     column_sortable_list = ('project_title', 'name')
+    column_exclude_list = ('belong', )
     column_labels = dict(project_title=u'项目',
                          name=u'名称',
                          size=u'尺寸',
                          number=u'数量',
                          description=u'备注',
-                         Belong=u'校验')
+                         belong=u'校验')
     column_descriptions = dict(
         project_title=
         u'工具所用于的拆装项目,请保证"Belong"列的内容与项目名一致(例如"737更换滑行灯工具"对应"<"Object 737更换滑行灯工具">"),保证录入工具和拆装项目匹配',
