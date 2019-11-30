@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from flask import Flask, url_for
+from flask import Flask, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 import container_whooshalchemyplus
 from flask_admin import Admin
@@ -9,6 +9,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask_admin.menu import MenuLink
 #from flask_admin.contrib.fileadmin import FileAdmin
 from aliyun import OSSFileAdmin
+from flask.ext.babelex import Babel
 from os import path
 from flask_restful import Api
 
@@ -109,6 +110,14 @@ def create_app():
                      endpoint='http://oss-cn-shanghai.aliyuncs.com',
                      name=u'阿里云存储'))
     babel.init_app(app)
+
+    @babel.localeselector
+    def get_locale():
+        override = 'zh_CN'
+        if override:
+            session['lang'] = override
+        return session.get('lang', 'en')
+
     bootstrap.init_app(app)
     # toolbar.init_app(app)
     api = Api(app)
