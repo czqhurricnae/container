@@ -104,11 +104,11 @@ class Advise(db.Model):
 
 
 class ProjectModelView(ModelView):
-    create_modal = True
-    edit_modal = True
     inline_models = [(Tool, dict(form_label=u'工具清单')),
                      (Advise, dict(form_label=u"Advise"))]
+
     column_searchable_list = ('title', )
+
     column_labels = dict(title=u'拆装项目',
                          model=u'机型',
                          chapter=u'章节号',
@@ -147,8 +147,6 @@ class ProjectModelView(ModelView):
 class ToolModelView(ModelView):
     can_create = False
 
-    edit_modal = True
-
     form_rules = [
         rules.FieldSet((), u'工具详情'),
         rules.Field(u'project_title'),
@@ -159,15 +157,22 @@ class ToolModelView(ModelView):
         rules.Header(u'校验'),
         rules.Field(u'belong'),
     ]
+
+    column_editable_list = ['size']
+
     column_searchable_list = ('project_title', )
+
     column_sortable_list = ('project_title', 'name')
+
     column_exclude_list = ('belong', )
+
     column_labels = dict(project_title=u'项目',
                          name=u'名称',
                          size=u'尺寸',
                          number=u'数量',
                          description=u'备注',
                          belong=u'校验')
+
     column_descriptions = dict(
         project_title=
         u'工具所用于的拆装项目,请保证"Belong"列的内容与项目名一致(例如"737更换滑行灯工具"对应"<"Object 737更换滑行灯工具">"),保证录入工具和拆装项目匹配',
@@ -187,6 +192,7 @@ class DocumentModelView(ModelView):
         rules.Field(u'chapter'),
         rules.Field(u'date'),
     ]
+
     column_searchable_list = ('title', 'path', 'office', 'model', 'chapter',
                               'date')
     column_sortable_list = ('title', 'path', 'office', 'model', 'chapter',
@@ -200,4 +206,5 @@ class DocumentModelView(ModelView):
         chapter=u'章节号',
         date=u'日期',
     )
+
     column_descriptions = dict(search_column=u'用于程序搜索文档使用,无参考意义', )
