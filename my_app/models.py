@@ -104,6 +104,8 @@ class Advise(db.Model):
 
 
 class ProjectModelView(ModelView):
+    create_modal = True
+    edit_modal = True
     inline_models = [(Tool, dict(form_label=u'工具清单')),
                      (Advise, dict(form_label=u"Advise"))]
     column_searchable_list = ('title', )
@@ -143,6 +145,10 @@ class ProjectModelView(ModelView):
 
 
 class ToolModelView(ModelView):
+    can_create = False
+
+    edit_modal = True
+
     form_rules = [
         rules.FieldSet((), u'工具详情'),
         rules.Field(u'project_title'),
