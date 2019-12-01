@@ -7,6 +7,7 @@ from weixin import WXAPPAPI
 from WXBizDataCrypt import WXBizDataCrypt
 from .models.tool import Tool, Project
 from .models.document import Document
+from .models.timesheet import Timesheet
 from .models.advise import Advise
 
 projects_resource_fields = {
@@ -24,6 +25,12 @@ tools_resource_fields = {
 documents_resource_fields = {
     'title': fields.String,
     'id': fields.Integer,
+}
+
+jobs_resource_fields = {
+    'title': fields.String,
+    'id': fields.Integer,
+    'time': fields.Float,
 }
 
 parser = reqparse.RequestParser()
@@ -174,3 +181,9 @@ class DocumentAPI(Resource):
         result[u'date'] = document.date
         result[u'get_url'] = document.get_url
         return [result]
+
+
+class JobsAPI(Resource):
+    @marshal_with(jobs_resource_fields)
+    def get(self):
+        return [job for job in Timesheet.query.all()]
