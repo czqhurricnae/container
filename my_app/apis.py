@@ -1,11 +1,13 @@
 # -*- coding:utf-8 -*-
 from flask_restful import Resource, fields, marshal_with, marshal, reqparse, current_app
 from flask import jsonify
-from weixin import WXAPPAPI
-from WXBizDataCrypt import WXBizDataCrypt
-from models import Project, Tool, Document
 import jieba
 import json
+from weixin import WXAPPAPI
+from WXBizDataCrypt import WXBizDataCrypt
+from .models.tool import Tool, Project
+from .models.document import Document
+from .models.advise import Advise
 
 projects_resource_fields = {
     'title': fields.String,

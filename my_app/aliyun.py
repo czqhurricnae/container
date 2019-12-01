@@ -326,7 +326,7 @@ class OSSFileAdmin(BaseFileAdmin):
         :param filename:  used to rename the name of path or file
         :return:
         """
-        from my_app.models import Document
+        from my_app.models.document import Document
         from my_app import db
         for item in self.storage.get_files(path=dir_base):
             if item[2] is False:
@@ -356,7 +356,7 @@ class OSSFileAdmin(BaseFileAdmin):
 
             By default do nothing.
         """
-        from my_app.models import Document, db
+        from my_app.models.document import Document, db
         try:
             document = Document.query.filter_by(
                 path=unicode(full_path)).first()
@@ -616,7 +616,7 @@ class OSSFileAdmin(BaseFileAdmin):
 
     def _save_form_files(self, directory, path, form):
 
-        from my_app.models import Document
+        from my_app.models.document import Document
         from my_app import db
         uploadfiles = request.files.getlist('upload')
 
@@ -738,7 +738,7 @@ class OSSFileAdmin(BaseFileAdmin):
             :param path:
                 Optional directory path. If not provided, will use the base directory
         """
-        from my_app.models import Document
+        from my_app.models.document import Document
         if self.can_delete:
             delete_form = self.delete_form()
         else:

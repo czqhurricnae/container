@@ -57,7 +57,10 @@ def create_app():
     from .index import index_blueprint
     from .administ import admin_blueprint
     from .document import documents_blueprint
-    from models import Tool, Project, Advise, Document, ProjectModelView, ToolModelView, DocumentModelView
+    from .models.tool import Tool, Project, ProjectModelView, ToolModelView
+    from .models.document import Document, DocumentModelView
+    from .models.advise import Advise
+
     from apis import ProjectsAPI, segmentationsAPI, ToolsAPI, Code2sessionAPI, UserInfoAPI, DocumentListAPI, DocumentAPI
     app = Flask(__name__,
                 instance_path=INSTANCE_PATH,
@@ -97,9 +100,15 @@ def create_app():
     container_whooshalchemyplus.init_app(app)
     admin.init_app(app)
     admin.add_view(
-        ProjectModelView(model=Project, session=db.session, name=u'拆装项目清单'))
+        ProjectModelView(model=Project,
+                         session=db.session,
+                         name=u'拆装项目清单',
+                         category=u'工具'))
     admin.add_view(
-        ToolModelView(model=Tool, session=db.session, name=u'拆装工具清单'))
+        ToolModelView(model=Tool,
+                      session=db.session,
+                      name=u'拆装工具清单',
+                      category=u'工具'))
     admin.add_view(
         DocumentModelView(model=Document, session=db.session, name=u'文档清单'))
     # admin.add_view(FileAdmin(base_path=UPLOAD_PATH, name=u'本地文件'))

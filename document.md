@@ -247,7 +247,7 @@ class ToolModelView(ModelView):
 ![](http://7xtyap.com1.z0.glb.clouddn.com/_Tue_Jul_19_11_39_31_2016.png)
 ![](http://7xtyap.com1.z0.glb.clouddn.com/screenshot_py_(2_7_11)_Tue_Jul_19_11_45_46_2016.png)
 
-在定义了endpoint后,在 `add_tool.html`就可以使用 `<div><a href = " {{url_for('test2.upload')}}">{{'test2.upload'}}</a>`</div>`,
+在定义了 endpoint后,在 `add_tool.html`就可以使用 `<div><a href = " {{url_for('test2.upload')}}">{{'test2.upload'}}</a>`</div>`,
 点击超链接后跳转到 URL`http://127.0.0.1:5000/admin/test2/`,其中 `test2`是定义过的 `endpoint`,`upload`是定义了 `endpoint`的 `class UpLoad(BaseView)`类的视图函数名.
 
 ```python
@@ -256,8 +256,8 @@ class UpLoad(BaseView):
     def upload(self):
         return self.render('add_tools.html')
 
-admin.add_view(UpLoad(name = u'添加工具1',category= u'添加工具',endpoint= 'test1'))
-admin.add_view(UpLoad(name = u'添加工具2',category= u'添加工具',endpoint= 'test2'))
+admin.add_view(UpLoad(name = u'添加工具1', category= u'添加工具', endpoint= 'test1'))
+admin.add_view(UpLoad(name = u'添加工具2', category= u'添加工具', endpoint= 'test2'))
 ```
 ![](http://7xtyap.com1.z0.glb.clouddn.com/screenshot_py_(2_7_11)_Tue_Jul_19_11_52_59_2016.png)
 
