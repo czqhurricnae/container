@@ -60,8 +60,9 @@ def create_app():
     from .models.tool import Tool, Project, ProjectModelView, ToolModelView
     from .models.document import Document, DocumentModelView
     from .models.advise import Advise
-
+    from .models.hierarchy import Department, Workshop, Team, DepartmentModelView, WorkshopModelView, TeamModelView
     from apis import ProjectsAPI, segmentationsAPI, ToolsAPI, Code2sessionAPI, UserInfoAPI, DocumentListAPI, DocumentAPI
+
     app = Flask(__name__,
                 instance_path=INSTANCE_PATH,
                 static_folder=STATIC_PATH,
@@ -94,11 +95,27 @@ def create_app():
     app.register_blueprint(documents_blueprint)
 
     db.init_app(app)
-
     with app.app_context():
         db.create_all()
+
     container_whooshalchemyplus.init_app(app)
+
     admin.init_app(app)
+    admin.add_view(
+        DepartmentModelView(model=Department,
+                            session=db.session,
+                            name=u'处室设置',
+                            category=u'机构设置'))
+    admin.add_view(
+        WorkshopModelView(model=Workshop,
+                          session=db.session,
+                          name=u'车间设置',
+                          category=u'机构设置'))
+    admin.add_view(
+        TeamModelView(model=Team,
+                      session=db.session,
+                      name=u'班组设置',
+                      category=u'机构设置'))
     admin.add_view(
         ProjectModelView(model=Project,
                          session=db.session,
@@ -118,6 +135,7 @@ def create_app():
                      bucket_name='filessystem',
                      endpoint='http://oss-cn-shanghai.aliyuncs.com',
                      name=u'阿里云存储'))
+
     babel.init_app(app)
 
     @babel.localeselector
@@ -129,6 +147,7 @@ def create_app():
 
     bootstrap.init_app(app)
     # toolbar.init_app(app)
+
     api = Api(app)
     api.add_resource(ProjectsAPI, '/api/projects')
     api.add_resource(segmentationsAPI, '/api/segmentations')

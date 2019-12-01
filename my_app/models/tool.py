@@ -107,8 +107,9 @@ class ToolModelView(ModelView):
 
 
 class ProjectModelView(ModelView):
+
     inline_models = [(Tool, dict(form_label=u'工具清单')),
-                     (Advise, dict(form_label=u"Advise"))]
+                     (Advise, dict(form_label=u"建议"))]
 
     column_searchable_list = ('title', )
 
