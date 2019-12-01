@@ -61,6 +61,7 @@ def create_app():
     from .models.document import Document, DocumentModelView
     from .models.advise import Advise
     from .models.hierarchy import Department, Workshop, Team, DepartmentModelView, WorkshopModelView, TeamModelView
+    from .models.timesheet import Timesheet, TimesheetModelView
     from apis import ProjectsAPI, segmentationsAPI, ToolsAPI, Code2sessionAPI, UserInfoAPI, DocumentListAPI, DocumentAPI
 
     app = Flask(__name__,
@@ -116,6 +117,9 @@ def create_app():
                       session=db.session,
                       name=u'班组设置',
                       category=u'机构设置'))
+    admin.add_view(
+        TimesheetModelView(model=Timesheet, session=db.session,
+                           name=u'标准工时清单'))
     admin.add_view(
         ProjectModelView(model=Project,
                          session=db.session,
