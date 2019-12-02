@@ -27,10 +27,10 @@ documents_resource_fields = {
     'id': fields.Integer,
 }
 
-jobs_resource_fields = {
+tasks_resource_fields = {
     'title': fields.String,
     'id': fields.Integer,
-    'time': fields.Float,
+    'taskTime': fields.Float,
 }
 
 parser = reqparse.RequestParser()
@@ -183,7 +183,7 @@ class DocumentAPI(Resource):
         return [result]
 
 
-class JobsAPI(Resource):
-    @marshal_with(jobs_resource_fields)
+class TasksAPI(Resource):
+    @marshal_with(tasks_resource_fields)
     def get(self):
-        return [job for job in Timesheet.query.all()]
+        return [task for task in Timesheet.query.all()]
