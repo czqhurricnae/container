@@ -60,9 +60,9 @@ def create_app():
     from .models.tool import Tool, Project, ProjectModelView, ToolModelView
     from .models.document import Document, DocumentModelView
     from .models.advise import Advise
-    from .models.hierarchy import Department, Workshop, Team, DepartmentModelView, WorkshopModelView, TeamModelView
+    from .models.hierarchy import Department, Workshop, Team, Worker, DepartmentModelView, WorkshopModelView, TeamModelView, WorkerModelView
     from .models.timesheet import Timesheet, TimesheetModelView
-    from apis import ProjectsAPI, segmentationsAPI, ToolsAPI, Code2sessionAPI, UserInfoAPI, DocumentListAPI, DocumentAPI, JobsAPI
+    from apis import ProjectsAPI, segmentationsAPI, ToolsAPI, Code2sessionAPI, UserInfoAPI, DocumentListAPI, DocumentAPI, TasksAPI
 
     app = Flask(__name__,
                 instance_path=INSTANCE_PATH,
@@ -107,29 +107,38 @@ def create_app():
                             session=db.session,
                             name=u'处室设置',
                             category=u'机构设置'))
+
     admin.add_view(
         WorkshopModelView(model=Workshop,
                           session=db.session,
                           name=u'车间设置',
                           category=u'机构设置'))
+
     admin.add_view(
         TeamModelView(model=Team,
                       session=db.session,
                       name=u'班组设置',
                       category=u'机构设置'))
+
+    admin.add_view(
+        WorkerModelView(model=Worker, session=db.session, name=u'人员管理'))
+
     admin.add_view(
         TimesheetModelView(model=Timesheet, session=db.session,
                            name=u'标准工时清单'))
+
     admin.add_view(
         ProjectModelView(model=Project,
                          session=db.session,
                          name=u'拆装项目清单',
                          category=u'工具'))
+
     admin.add_view(
         ToolModelView(model=Tool,
                       session=db.session,
                       name=u'拆装工具清单',
                       category=u'工具'))
+
     admin.add_view(
         DocumentModelView(model=Document, session=db.session, name=u'文档清单'))
     # admin.add_view(FileAdmin(base_path=UPLOAD_PATH, name=u'本地文件'))
@@ -160,7 +169,7 @@ def create_app():
     api.add_resource(UserInfoAPI, '/api/userInfo')
     api.add_resource(DocumentListAPI, '/api/documents')
     api.add_resource(DocumentAPI, '/api/documents/<document_id>/')
-    api.add_resource(JobsAPI, '/api/jobs')
+    api.add_resource(TasksAPI, '/api/tasks')
     return app
 
 
