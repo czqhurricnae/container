@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
-from flask_restful import Resource, fields, marshal_with, marshal, reqparse, current_app
-from flask import jsonify
+from flask_restful import Resource, fields, marshal_with, marshal, reqparse
+from flask import jsonify, current_app
 import jieba
 import json
 from weixin import WXAPPAPI
@@ -9,6 +9,9 @@ from .models.tool import Tool, Project
 from .models.document import Document
 from .models.timesheet import Timesheet
 from .models.advise import Advise
+from .models.hierarchy import Worker
+from .models.timesheetTable import TimesheetTable
+from my_app import db
 
 projects_resource_fields = {
     'title': fields.String,
@@ -30,7 +33,21 @@ documents_resource_fields = {
 tasks_resource_fields = {
     'title': fields.String,
     'id': fields.Integer,
-    'taskTime': fields.Float,
+    'tasktime': fields.Float,
+    'kind': fields.String,
+}
+
+timesheet_fields = {
+    'name': fields.String,
+    'number': fields.Integer,
+    'task': fields.String,
+    'tasktime': fields.Float,
+    'type': fields.String,
+    'approved': fields.String,
+}
+
+timesheets_fields = {
+    fields.List(fields.Nested(timesheet_fields)),
 }
 
 parser = reqparse.RequestParser()
@@ -39,6 +56,8 @@ parser.add_argument('code', type=str, help='code must be a string.')
 parser.add_argument('session_key', type=str, help='code must be a string.')
 parser.add_argument('encrypted_data', type=str, help='code must be a string.')
 parser.add_argument('iv', type=str, help='code must be a string.')
+timesheet_parser = reqparse.RequestParser()
+timesheet_parser.add_argument(u'timesheets')
 
 
 class ProjectsAPI(Resource):
@@ -119,6 +138,7 @@ class Code2sessionAPI(Resource):
 
 class UserInfoAPI(Resource):
     def post(self):
+
         args = parser.parse_args()
 
         APP_ID = current_app.config.get('APP_ID')
@@ -129,7 +149,14 @@ class UserInfoAPI(Resource):
         if APP_ID and session_key and encrypted_data and iv:
             crypt = WXBizDataCrypt(APP_ID, session_key)
             user_info = crypt.decrypt(encrypted_data, iv)
-            user_info.update(login=True)
+            print(type(user_info.get('nickName')))
+            if user_info.get('nickName', None):
+                worker = Worker.query.filter_by(
+                    name=user_info['nickName']).first()
+                if worker:
+                    user_info.update(number=worker.number,
+                                     authority=worker.authority,
+                                     login=True)
             return jsonify(user_info)
 
 

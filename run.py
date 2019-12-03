@@ -8,6 +8,7 @@ from my_app import create_app, db
 from my_app.models.tool import Tool, Project
 from my_app.models.document import Document
 from my_app.models.advise import Advise
+from my_app.models.hierarchy import Worker
 # from my_app.scrapper import Scrapper
 
 reload(sys)
@@ -26,7 +27,8 @@ def _make_context():
                 Tool=Tool,
                 Project=Project,
                 Document=Document,
-                Advise=Advise)
+                Advise=Advise,
+                Worker=Worker)
 
 
 manager.add_command('shell', Shell(make_context=_make_context))

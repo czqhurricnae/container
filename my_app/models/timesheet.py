@@ -16,29 +16,30 @@ class Timesheet(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.UnicodeText(64), nullable=False)
-    taskTime = db.Column(db.Float, default=1)
-    type = db.Column(db.Enum(u'例行', u'非例行', u'车间杂项', u'排故'), nullable=False)
+    tasktime = db.Column(db.Float, default=1)
+    kind = db.Column(db.Enum(u'例行', u'非例行', u'车间杂项', u'排故', u'其他'),
+                     nullable=False)
 
-    def __init__(self, title, taskTime, type):
+    def __init__(self, title, tasktime, kind):
         self.title = title
-        self.taskTime = taskTime
-        self.type = type
+        self.tasktime = tasktime
+        self.kind = kind
 
     def __repr__(self):
-        return u'<Timesheet{0:s: 1:s}>'.format(self.title, self.taskTime)
+        return u'<Timesheet{0}: {1}>'.format(self.title, self.tasktime)
 
 
 class TimesheetModelView(ModelView):
 
     edit_modal = True
 
-    column_editable_list = ('title', 'taskTime', 'type')
+    column_editable_list = ('title', 'tasktime', 'kind')
 
     column_searchable_list = ('title', )
 
     column_sortable_list = ('title', )
 
-    column_labels = dict(title=u'工作名称', taskTime=u'工时', type=u'工作类别')
+    column_labels = dict(title=u'工作名称', tasktime=u'工时', kind=u'工作类别')
 
     def scaffold_form(self):
         form_class = super(TimesheetModelView, self).scaffold_form()
@@ -47,8 +48,8 @@ class TimesheetModelView(ModelView):
     def create_model(self, form):
         model = self.model(
             form.title.data,
-            form.taskTime.data,
-            form.type.data,
+            form.tasktime.data,
+            form.kind.data,
         )
         form.populate_obj(model)
         self.session.add(model)

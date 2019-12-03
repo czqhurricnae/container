@@ -176,6 +176,7 @@ def create_app():
     api.add_resource(DocumentListAPI, '/api/documents')
     api.add_resource(DocumentAPI, '/api/documents/<document_id>/')
     api.add_resource(TasksAPI, '/api/tasks')
+    # api.add_resource(TimesheetTableAPI, '/api/timesheetTables')
     return app
 
 

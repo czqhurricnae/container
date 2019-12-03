@@ -26,7 +26,7 @@ class Tool(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
 
     def __repr__(self):
-        return u'<Tool {0:s}>'.format(self.name)
+        return u'<Tool {0!s}>'.format(self.name)
 
     @property
     def to_html(self):

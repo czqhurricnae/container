@@ -5,6 +5,7 @@ import jieba
 from functools import reduce
 import json
 import ast
+from datetime import datetime
 
 
 @index.route('/', methods=['GET', 'POST'])
@@ -59,3 +60,25 @@ def advise():
             db.session.add(advise)
             db.session.commit()
         return jsonify(advises=advises)
+
+
+@index.route('/api/timesheetTables', methods=['POST', 'GET'])
+def timesheets():
+    from my_app.models.timesheetTable import TimesheetTable, db
+    if request.method == 'POST':
+        timesheets = request.get_json().get(u'timesheets')
+        items = []
+        for timesheet in timesheets:
+            items.append(
+                TimesheetTable(name=timesheet.get(u'name'),
+                               number=int(timesheet.get(u'number')),
+                               date=datetime.strptime(timesheet.get(u'date'),
+                                                      '%Y-%m-%d'),
+                               airplane=timesheet.get(u'airplane'),
+                               task=timesheet.get(u'task'),
+                               tasktime=float(timesheet.get(u'tasktime')),
+                               kind=timesheet.get(u'kind'),
+                               approved=timesheet.get(u'approved', u'否')))
+        db.session.add_all(items)
+        db.session.commit()
+    return 'timesheets commit successfully.'

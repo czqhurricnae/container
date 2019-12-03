@@ -16,42 +16,49 @@ class TimesheetTable(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.UnicodeText(64), nullable=False)
-    NO = db.Column(db.Integer, nullable=False)
+    number = db.Column(db.Integer, nullable=False)
+    date = db.Column(db.DATE, default=datetime.now)
+    airplane = db.Column(db.UnicodeText(64), nullable=False)
     task = db.Column(db.UnicodeText(64), nullable=False)
-    taskTime = db.Column(db.Float, default=1)
-    type = db.Column(db.Enum(u'例行', u'非例行', u'车间杂项', u'排故'),
+    tasktime = db.Column(db.Float, default=1)
+    kind = db.Column(db.Enum(u'例行', u'非例行', u'车间杂项', u'排故', u'其他'),
                      nullable=False,
                      default=u'例行')
     approved = db.Column(db.Enum(u'是', u'否'), nullable=False, default=u'否')
 
-    def __init__(self, name, NO, task, taskTime, type, approved):
+    def __init__(self, name, number, date, airplane, task, tasktime, kind,
+                 approved):
         self.name = name
-        self.NO = NO
+        self.number = number
+        self.date = date
+        self.airplane = airplane
         self.task = task
-        self.taskTime = taskTime
-        self.type = type
+        self.tasktime = tasktime
+        self.kind = kind
         self.approved = approved
 
     def __repr__(self):
-        return u'<TimesheetTable{0:s: [1:s, 2:s]}>'.format(
-            self.name, self.task, self.taskTime)
+        return u'<TimesheetTable{0}: {1}-{2}>'.format(self.name, self.task,
+                                                      self.tasktime)
 
 
 class TimesheetTableModelView(ModelView):
 
     edit_modal = True
 
-    column_editable_list = ('task', 'taskTime', 'type', 'approved')
+    column_editable_list = ('task', 'tasktime', 'kind', 'approved')
 
     column_searchable_list = ('name', 'task', 'approved')
 
     column_sortable_list = ('task', )
 
     column_labels = dict(name=u'工作者',
-                         NO=u'工号',
+                         number=u'工号',
+                         date=u'日期',
+                         airplane=u'飞机',
                          task=u'工作名称',
-                         taskTime=u'工时',
-                         type=u'工作类别',
+                         tasktime=u'工时',
+                         kind=u'工作类别',
                          approved=u'是否审核')
 
     def scaffold_form(self):
@@ -59,8 +66,9 @@ class TimesheetTableModelView(ModelView):
         return form_class
 
     def create_model(self, form):
-        model = self.model(form.name.data, form.NO.data, form.task.data,
-                           form.taskTime.data, form.type.data,
+        model = self.model(form.name.data, form.number.data, form.date.data,
+                           form.airplane.data, form.task.data,
+                           form.tasktime.data, form.kind.data,
                            form.approved.data)
         form.populate_obj(model)
         self.session.add(model)

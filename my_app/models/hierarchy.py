@@ -30,7 +30,7 @@ class Department(db.Model):
         self.name = name
 
     def __repr__(self):
-        return u'<Department {0:s}>'.format(self.name)
+        return u'<Department {0!s}>'.format(self.name)
 
 
 class Workshop(db.Model):
@@ -50,7 +50,7 @@ class Workshop(db.Model):
                                   lazy=u'dynamic')
 
     def __repr__(self):
-        return u'<Workshop {0:s}>'.format(self.name)
+        return u'<Workshop {0!s}>'.format(self.name)
 
 
 class Team(db.Model):
@@ -68,7 +68,7 @@ class Team(db.Model):
                                   lazy=u'dynamic')
 
     def __repr__(self):
-        return u'<Team {0:s}>'.format(self.name)
+        return u'<Team {0!s}>'.format(self.name)
 
 
 class Worker(db.Model):
@@ -79,7 +79,7 @@ class Worker(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.UnicodeText(64), nullable=False)
-    NO = db.Column(db.Integer, nullable=False)
+    number = db.Column(db.Integer, nullable=False)
     major = db.Column(db.Enum(u'机械', u'电子', u'结构', u'电气'),
                       nullable=False,
                       default=u'机械')
@@ -94,11 +94,11 @@ class Worker(db.Model):
     Workshop_id = db.Column(db.Integer, db.ForeignKey('workshops.id'))
     team_id = db.Column(db.Integer, db.ForeignKey('teams.id'))
 
-    def __init__(self, name, NO, major, post, authority, belongto_department,
-                 belongto_workshop, belongto_team):
+    def __init__(self, name, number, major, post, authority,
+                 belongto_department, belongto_workshop, belongto_team):
         self.name = name
-        self.NO = NO
-        self.major = major
+        self.number = number
+        self.major = (major)
         self.post = post
         self.authority = authority
         self.belongto_department = belongto_department
@@ -106,7 +106,7 @@ class Worker(db.Model):
         self.belongto_team = belongto_team
 
     def __repr__(self):
-        return u'<Worker {0:s: 1:s}>'.format(self.name, self.NO)
+        return u'<Worker {0}: {1}>'.format(self.name, self.number)
 
 
 class DepartmentModelView(ModelView):
@@ -160,14 +160,14 @@ class WorkerModelView(ModelView):
 
     edit_modal = True
 
-    column_editable_list = ('name', 'NO', 'major', 'post', 'authority',
+    column_editable_list = ('name', 'number', 'major', 'post', 'authority',
                             'belongto_department', 'belongto_workshop',
                             'belongto_team')
 
-    column_sortable_list = ('name', 'NO')
+    column_sortable_list = ('name', 'number')
 
     column_labels = dict(name=u'姓名',
-                         NO=u'工号',
+                         number=u'工号',
                          major=u'专业',
                          post=u'职位',
                          authority=u'管理权限',
@@ -180,7 +180,7 @@ class WorkerModelView(ModelView):
         return form_class
 
     def create_model(self, form):
-        model = self.model(form.name.data, form.NO.data, form.major.data,
+        model = self.model(form.name.data, form.number.data, form.major.data,
                            form.post.data, form.authority.data,
                            form.belongto_department.data,
                            form.belongto_workshop.data,

@@ -24,4 +24,4 @@ class Advise(db.Model):
         self.project_id = project_id
 
     def __repr__(self):
-        return u'<Advise 关于{0:s}的一些建议>'.format(self.improve.title)
+        return u'<Advise 关于{0!s}的一些建议>'.format(self.improve.title)
