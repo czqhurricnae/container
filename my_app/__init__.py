@@ -62,6 +62,7 @@ def create_app():
     from .models.advise import Advise
     from .models.hierarchy import Department, Workshop, Team, Worker, DepartmentModelView, WorkshopModelView, TeamModelView, WorkerModelView
     from .models.timesheet import Timesheet, TimesheetModelView
+    from .models.timesheetTable import TimesheetTable, TimesheetTableModelView
     from apis import ProjectsAPI, segmentationsAPI, ToolsAPI, Code2sessionAPI, UserInfoAPI, DocumentListAPI, DocumentAPI, TasksAPI
 
     app = Flask(__name__,
@@ -102,6 +103,11 @@ def create_app():
     container_whooshalchemyplus.init_app(app)
 
     admin.init_app(app)
+    admin.add_view(
+        TimesheetTableModelView(model=TimesheetTable,
+                                session=db.session,
+                                name=u'工时管理'))
+
     admin.add_view(
         DepartmentModelView(model=Department,
                             session=db.session,
