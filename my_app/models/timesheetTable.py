@@ -1,9 +1,13 @@
 # -*- coding:utf-8 -*-
-from flask import url_for
+from flask import url_for, flash, redirect, request
 from jieba.analyse import ChineseAnalyzer
 from flask_admin.contrib.sqla import ModelView
+from flask_admin.model.template import EndpointLinkRowAction
+from flask_admin.helpers import get_redirect_target, flash_errors
 from sqlalchemy import func
 from flask_admin.form import rules
+from flask_admin import expose
+from flask_babel import gettext
 from datetime import datetime
 from .. import db
 from ..aliyun import OSSFileAdmin
@@ -102,6 +106,13 @@ class PendingApprovedModelView(ModelView):
                          kind=u'工作类别',
                          approved=u'是否审核')
 
+    column_extra_row_actions = [
+        EndpointLinkRowAction(
+            'off glyphicon glyphicon-off',
+            'timesheettable.approve_view',
+        )
+    ]
+
     def get_query(self):
         return self.session.query(
             self.model).filter(self.model.approved == u'否')
@@ -109,3 +120,29 @@ class PendingApprovedModelView(ModelView):
     def get_count_query(self):
         return self.session.query(
             func.count('*')).filter(TimesheetTable.approved == u'否')
+
+    @expose('/approve/', methods=('GET', ))
+    def approve_view(self):
+        """
+            Activate user model view. Only GET method is allowed.
+        """
+        return_url = get_redirect_target() or self.get_url('admin.index')
+
+        id = request.args["id"]
+        model = self.get_one(id)
+
+        if model is None:
+            flash(u'用户不存在', u'error')
+            return redirect(return_url)
+
+        if model.approved == u'是':
+            flash(u'已经审核, 无需重复审核.', u'warning')
+            return redirect(return_url)
+
+        model.approved = u'是'
+        self.session.add(model)
+        self.session.commit()
+
+        flash(u'已审核', u'success')
+        # return redirect(return_url)
+        return u'审核成功.'
