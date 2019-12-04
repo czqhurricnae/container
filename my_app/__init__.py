@@ -2,7 +2,7 @@
 from flask import Flask, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 import container_whooshalchemyplus
-from flask_admin import Admin
+from flask_admin import Admin, BaseView, expose, AdminIndexView
 from flask_babel import Babel
 from flask_bootstrap import Bootstrap
 from flask_debugtoolbar import DebugToolbarExtension
@@ -62,7 +62,7 @@ def create_app():
     from .models.advise import Advise
     from .models.hierarchy import Department, Workshop, Team, Worker, DepartmentModelView, WorkshopModelView, TeamModelView, WorkerModelView
     from .models.timesheet import Timesheet, TimesheetModelView
-    from .models.timesheetTable import TimesheetTable, TimesheetTableModelView
+    from .models.timesheetTable import TimesheetTable, TimesheetTableModelView, PendingApprovedModelView
     from apis import ProjectsAPI, segmentationsAPI, ToolsAPI, Code2sessionAPI, UserInfoAPI, DocumentListAPI, DocumentAPI, TasksAPI
 
     app = Flask(__name__,
@@ -104,9 +104,15 @@ def create_app():
 
     admin.init_app(app)
     admin.add_view(
-        TimesheetTableModelView(model=TimesheetTable,
-                                session=db.session,
-                                name=u'工时管理'))
+        PendingApprovedModelView(model=TimesheetTable,
+                                 session=db.session,
+                                 name=u'工时审核',
+                                 category=u'工时管理'))
+    # admin.add_view(
+    #     TimesheetTableModelView(model=TimesheetTable,
+    #                             session=db.session,
+    #                             name=u'工时查看',
+    #                             category=u'工时管理'))
 
     admin.add_view(
         DepartmentModelView(model=Department,

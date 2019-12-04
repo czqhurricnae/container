@@ -2,6 +2,7 @@
 from flask import url_for
 from jieba.analyse import ChineseAnalyzer
 from flask_admin.contrib.sqla import ModelView
+from sqlalchemy import func
 from flask_admin.form import rules
 from datetime import datetime
 from .. import db
@@ -74,3 +75,30 @@ class TimesheetTableModelView(ModelView):
         self.session.add(model)
         self._on_model_change(form, model, True)
         self.session.commit()
+
+
+class PendingApprovedModelView(ModelView):
+    edit_modal = True
+
+    column_editable_list = ('task', 'tasktime', 'kind', 'approved')
+
+    column_searchable_list = ('name', 'task', 'approved')
+
+    column_sortable_list = ('task', )
+
+    column_labels = dict(name=u'工作者',
+                         number=u'工号',
+                         date=u'日期',
+                         airplane=u'飞机',
+                         task=u'工作名称',
+                         tasktime=u'工时',
+                         kind=u'工作类别',
+                         approved=u'是否审核')
+
+    def get_query(self):
+        return self.session.query(
+            self.model).filter(self.model.approved == u'否')
+
+    def get_count_query(self):
+        return self.session.query(
+            func.count('*')).filter(TimesheetTable.approved == u'否')
