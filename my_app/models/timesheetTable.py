@@ -22,19 +22,23 @@ class TimesheetTable(db.Model):
     airplane = db.Column(db.UnicodeText(64), nullable=False)
     task = db.Column(db.UnicodeText(64), nullable=False)
     tasktime = db.Column(db.Float, default=1)
+    belongto_team = db.Column(db.UnicodeText(64),
+                              nullable=False,
+                              default=u'其他')
     kind = db.Column(db.Enum(u'例行', u'非例行', u'车间杂项', u'排故', u'其他'),
                      nullable=False,
                      default=u'例行')
     approved = db.Column(db.Enum(u'是', u'否'), nullable=False, default=u'否')
 
-    def __init__(self, name, number, date, airplane, task, tasktime, kind,
-                 approved):
+    def __init__(self, name, number, date, airplane, task, tasktime,
+                 belongto_team, kind, approved):
         self.name = name
         self.number = number
         self.date = date
         self.airplane = airplane
         self.task = task
         self.tasktime = tasktime
+        self.belongto_team = belongto_team
         self.kind = kind
         self.approved = approved
 
@@ -59,6 +63,7 @@ class TimesheetTableModelView(ModelView):
                          airplane=u'飞机',
                          task=u'工作名称',
                          tasktime=u'工时',
+                         belongto_team=u'班组',
                          kind=u'工作类别',
                          approved=u'是否审核')
 
@@ -78,11 +83,12 @@ class TimesheetTableModelView(ModelView):
 
 
 class PendingApprovedModelView(ModelView):
+
     edit_modal = True
 
     column_editable_list = ('task', 'tasktime', 'kind', 'approved')
 
-    column_searchable_list = ('name', 'task', 'approved')
+    column_searchable_list = ('name', 'task', 'approved', 'belongto_team')
 
     column_sortable_list = ('task', )
 
@@ -92,6 +98,7 @@ class PendingApprovedModelView(ModelView):
                          airplane=u'飞机',
                          task=u'工作名称',
                          tasktime=u'工时',
+                         belongto_team=u'班组',
                          kind=u'工作类别',
                          approved=u'是否审核')
 

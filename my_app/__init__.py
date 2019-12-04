@@ -108,12 +108,6 @@ def create_app():
                                  session=db.session,
                                  name=u'工时审核',
                                  category=u'工时管理'))
-    # admin.add_view(
-    #     TimesheetTableModelView(model=TimesheetTable,
-    #                             session=db.session,
-    #                             name=u'工时查看',
-    #                             category=u'工时管理'))
-
     admin.add_view(
         DepartmentModelView(model=Department,
                             session=db.session,

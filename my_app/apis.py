@@ -156,6 +156,7 @@ class UserInfoAPI(Resource):
                 if worker:
                     user_info.update(number=worker.number,
                                      authority=worker.authority,
+                                     belongto_team=str(worker.belongto_team),
                                      login=True)
             return jsonify(user_info)
 

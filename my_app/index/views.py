@@ -78,6 +78,7 @@ def timesheets():
                                task=timesheet.get(u'task'),
                                tasktime=float(timesheet.get(u'tasktime')),
                                kind=timesheet.get(u'kind'),
+                               belongto_team=timesheet.get(u'belongto_team'),
                                approved=timesheet.get(u'approved', u'否')))
         db.session.add_all(items)
         db.session.commit()
