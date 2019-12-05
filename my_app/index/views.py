@@ -62,24 +62,24 @@ def advise():
         return jsonify(advises=advises)
 
 
-@index.route('/api/timesheetTables', methods=['POST', 'GET'])
+@index.route('/api/timesheets', methods=['POST', 'GET'])
 def timesheets():
-    from my_app.models.timesheetTable import TimesheetTable, db
+    from my_app.models.timesheet import Timesheet, db
     if request.method == 'POST':
         timesheets = request.get_json().get(u'timesheets')
         items = []
         for timesheet in timesheets:
             items.append(
-                TimesheetTable(name=timesheet.get(u'name'),
-                               number=int(timesheet.get(u'number')),
-                               date=datetime.strptime(timesheet.get(u'date'),
-                                                      '%Y-%m-%d'),
-                               airplane=timesheet.get(u'airplane'),
-                               task=timesheet.get(u'task'),
-                               tasktime=float(timesheet.get(u'tasktime')),
-                               kind=timesheet.get(u'kind'),
-                               belongto_team=timesheet.get(u'belongto_team'),
-                               approved=timesheet.get(u'approved', u'否')))
+                Timesheet(name=timesheet.get(u'name'),
+                          number=int(timesheet.get(u'number')),
+                          date=datetime.strptime(timesheet.get(u'date'),
+                                                 '%Y-%m-%d'),
+                          airplane=timesheet.get(u'airplane'),
+                          task=timesheet.get(u'task'),
+                          tasktime=float(timesheet.get(u'tasktime')),
+                          kind=timesheet.get(u'kind'),
+                          belongto_team=timesheet.get(u'belongto_team'),
+                          approved=timesheet.get(u'approved', u'否')))
         db.session.add_all(items)
         db.session.commit()
     return 'timesheets commit successfully.'

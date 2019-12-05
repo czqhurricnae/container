@@ -61,8 +61,8 @@ def create_app():
     from .models.document import Document, DocumentModelView
     from .models.advise import Advise
     from .models.hierarchy import Department, Workshop, Team, Worker, DepartmentModelView, WorkshopModelView, TeamModelView, WorkerModelView
-    from .models.timesheet import Timesheet, TimesheetModelView
-    from .models.timesheetTable import TimesheetTable, TimesheetTableModelView, PendingApprovedModelView
+    from .models.standard import StandardTime, StandardTimeModelView
+    from .models.timesheet import Timesheet, TimesheetModelView, PendingApprovedModelView
     from apis import ProjectsAPI, segmentationsAPI, ToolsAPI, Code2sessionAPI, UserInfoAPI, DocumentListAPI, DocumentAPI, TasksAPI
 
     app = Flask(__name__,
@@ -104,7 +104,7 @@ def create_app():
 
     admin.init_app(app)
     admin.add_view(
-        PendingApprovedModelView(model=TimesheetTable,
+        PendingApprovedModelView(model=Timesheet,
                                  session=db.session,
                                  name=u'工时审核',
                                  category=u'工时管理'))
@@ -130,8 +130,9 @@ def create_app():
         WorkerModelView(model=Worker, session=db.session, name=u'人员管理'))
 
     admin.add_view(
-        TimesheetModelView(model=Timesheet, session=db.session,
-                           name=u'标准工时清单'))
+        StandardTimeModelView(model=StandardTime,
+                              session=db.session,
+                              name=u'标准工时清单'))
 
     admin.add_view(
         ProjectModelView(model=Project,
@@ -176,7 +177,6 @@ def create_app():
     api.add_resource(DocumentListAPI, '/api/documents')
     api.add_resource(DocumentAPI, '/api/documents/<document_id>/')
     api.add_resource(TasksAPI, '/api/tasks')
-    # api.add_resource(TimesheetTableAPI, '/api/timesheetTables')
     return app
 
 

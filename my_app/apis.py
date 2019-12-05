@@ -7,10 +7,10 @@ from weixin import WXAPPAPI
 from WXBizDataCrypt import WXBizDataCrypt
 from .models.tool import Tool, Project
 from .models.document import Document
-from .models.timesheet import Timesheet
+from .models.standard import StandardTime
 from .models.advise import Advise
 from .models.hierarchy import Worker
-from .models.timesheetTable import TimesheetTable
+from .models.timesheet import Timesheet
 from my_app import db
 
 projects_resource_fields = {
@@ -37,27 +37,12 @@ tasks_resource_fields = {
     'kind': fields.String,
 }
 
-timesheet_fields = {
-    'name': fields.String,
-    'number': fields.Integer,
-    'task': fields.String,
-    'tasktime': fields.Float,
-    'type': fields.String,
-    'approved': fields.String,
-}
-
-timesheets_fields = {
-    fields.List(fields.Nested(timesheet_fields)),
-}
-
 parser = reqparse.RequestParser()
 parser.add_argument('search')
 parser.add_argument('code', type=str, help='code must be a string.')
 parser.add_argument('session_key', type=str, help='code must be a string.')
 parser.add_argument('encrypted_data', type=str, help='code must be a string.')
 parser.add_argument('iv', type=str, help='code must be a string.')
-timesheet_parser = reqparse.RequestParser()
-timesheet_parser.add_argument(u'timesheets')
 
 
 class ProjectsAPI(Resource):
@@ -214,4 +199,4 @@ class DocumentAPI(Resource):
 class TasksAPI(Resource):
     @marshal_with(tasks_resource_fields)
     def get(self):
-        return [task for task in Timesheet.query.all()]
+        return [task for task in StandardTime.query.all()]

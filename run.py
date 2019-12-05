@@ -1,5 +1,7 @@
 # -*- coding:utf-8 -*-
 import sys
+reload(sys)
+sys.setdefaultencoding(u'utf8')
 import jieba
 from flask_script import Shell, Manager
 from flask_migrate import MigrateCommand, Migrate
@@ -11,10 +13,7 @@ from my_app.models.advise import Advise
 from my_app.models.hierarchy import Worker
 # from my_app.scrapper import Scrapper
 
-reload(sys)
-sys.setdefaultencoding('utf8')
-
-jieba.load_userdict('userdict.txt')
+jieba.load_userdict(u'userdict.txt')
 
 app = create_app()
 migrate = Migrate(app, db)
@@ -38,4 +37,3 @@ whoosh_index(app, Document)
 
 if __name__ == '__main__':
     manager.run()
-    # app.run()
