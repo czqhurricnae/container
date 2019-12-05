@@ -3,6 +3,7 @@ from flask import url_for, flash, redirect, request
 from jieba.analyse import ChineseAnalyzer
 from flask_admin import expose
 from flask_admin.contrib.sqla import ModelView
+from flask_admin.contrib.sqla.filters import BaseSQLAFilter, FilterEqual
 from flask_admin.model.template import EndpointLinkRowAction
 from flask_admin.helpers import get_redirect_target, flash_errors
 from flask_admin.form import rules
@@ -87,6 +88,11 @@ class TimesheetModelView(ModelView):
         self.session.commit()
 
 
+def get_all_team_names():
+    unique_team_names = Team.query.all()
+    return [(str(team), str(team)) for team in unique_team_names]
+
+
 class PendingApprovedModelView(ModelView):
 
     edit_modal = True
@@ -110,7 +116,7 @@ class PendingApprovedModelView(ModelView):
     column_extra_row_actions = [
         EndpointLinkRowAction(
             'off glyphicon glyphicon-check',
-            'timesheettable.approve_view',
+            'timesheet.approve_view',
         )
     ]
 
@@ -122,12 +128,33 @@ class PendingApprovedModelView(ModelView):
         return self.session.query(
             func.count('*')).filter(Timesheet.approved == u'否')
 
+    def get_filters(self):
+        _dynamic_filters = getattr(self, 'dynamic_filters', None)
+        if _dynamic_filters:
+            return (super(PendingApprovedModelView, self).get_filters()
+                    or []) + _dynamic_filters
+        else:
+            return super(PendingApprovedModelView, self).get_filters()
+
+    @expose('/')
+    def index_view(self):
+        self.dynamic_filters = []
+        self.dynamic_filters.extend([
+            FilterEqual(column=Timesheet.belongto_team,
+                        name=u'班组',
+                        options=get_all_team_names),
+            # Add further dynamic filters here
+        ])
+        self._refresh_filters_cache()
+        return super(PendingApprovedModelView, self).index_view()
+
     @expose('/approve/', methods=('GET', ))
     def approve_view(self):
         """
             Activate user model view. Only GET method is allowed.
         """
-        return_url = get_redirect_target() or self.get_url('admin.index')
+        return_url = get_redirect_target() or self.get_url(
+            'timesheet.details_view')
 
         id = request.args["id"]
         model = self.get_one(id)

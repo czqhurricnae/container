@@ -10,7 +10,7 @@ from my_app import create_app, db
 from my_app.models.tool import Tool, Project
 from my_app.models.document import Document
 from my_app.models.advise import Advise
-from my_app.models.hierarchy import Worker
+from my_app.models.hierarchy import Team, Worker
 # from my_app.scrapper import Scrapper
 
 jieba.load_userdict(u'userdict.txt')
@@ -27,6 +27,7 @@ def _make_context():
                 Project=Project,
                 Document=Document,
                 Advise=Advise,
+                Team=Team,
                 Worker=Worker)
 
 
