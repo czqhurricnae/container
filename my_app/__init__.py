@@ -47,7 +47,9 @@ The definition is `def register_blueprint(self, blueprint, **options)`.
 """
 
 db = SQLAlchemy()
-admin = Admin(name=u'后台管理', template_mode='bootstrap3')
+admin = Admin(name=u'后台管理',
+              template_mode='bootstrap3',
+              base_template='AdminLTE_master.html')
 babel = Babel()
 bootstrap = Bootstrap()
 #toolbar = DebugToolbarExtension()

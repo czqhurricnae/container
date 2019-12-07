@@ -7,16 +7,13 @@ from werkzeug.utils import secure_filename
 from my_app import UPLOAD_PATH
 
 
-@administ.route('/editor/', methods=['GET', 'POST'])
-def editor():
-    return render_template('ueditor.html')
-
-
 @administ.route('/upload/', methods=['GET', 'POST'])
 def upload():
     result = {}
     action = request.args.get('action')
-    with open(os.path.join(administ.static_folder, 'ueditor', 'php', 'config.json')) as fp:
+    with open(
+            os.path.join(administ.static_folder, 'ueditor', 'php',
+                         'config.json')) as fp:
         try:
             CONFIG = json.loads(re.sub(r'\/\*.*\*\/', '', fp.read()))
         except:

@@ -277,13 +277,13 @@ class OSSFileAdmin(BaseFileAdmin):
             admin.add_view(S3FileAdmin('files_bucket', 'us-east-1', 'key_id', 'secret_key')
     """
     """
-    把从BaseFileAdmin继承的upload_template改写成自定义的'my_upload.html'
+    把从BaseFileAdmin继承的 upload_template改写成自定义的 'aliyun_upload.html'
     """
-    upload_template = 'admin/my_upload.html'
-    list_template = 'admin/my_list.html'
-    mkdir_modal_template = 'admin/my_form.html'
-    mkdir_template = 'admin/my_form.html'
-    rename_template = 'admin/my_form.html'
+    upload_template = 'admin/aliyun_upload.html'
+    list_template = 'admin/aliyun_list.html'
+    mkdir_modal_template = 'admin/aliyun_form.html'
+    mkdir_template = 'admin/aliyun_form.html'
+    rename_template = 'admin/aliyun_form.html'
 
     def __init__(self, bucket_name, access_key, secret_key, endpoint, *args,
                  **kwargs):
