@@ -70,16 +70,17 @@ def timesheets():
         items = []
         for timesheet in timesheets:
             items.append(
-                Timesheet(name=timesheet.get(u'name'),
-                          number=int(timesheet.get(u'number')),
-                          date=datetime.strptime(timesheet.get(u'date'),
-                                                 '%Y-%m-%d'),
-                          airplane=timesheet.get(u'airplane'),
-                          task=timesheet.get(u'task'),
-                          tasktime=float(timesheet.get(u'tasktime')),
-                          kind=timesheet.get(u'kind'),
-                          belongto_team=timesheet.get(u'belongto_team'),
-                          approved=timesheet.get(u'approved', u'否')))
+                Timesheet(
+                    name=timesheet.get('name'),
+                    number=int(timesheet.get('number')),
+                    date=datetime.strptime(timesheet.get('date'), '%Y-%m-%d'),
+                    airplane=timesheet.get('airplane'),
+                    task=timesheet.get('task'),
+                    calculated_time=float(timesheet.get('calculatedTime')),
+                    completed=timesheet.get('completed', u'全部完成'),
+                    kind=timesheet.get('kind'),
+                    belongto_team=timesheet.get('belongto_team'),
+                    approved=timesheet.get('approved', u'否')))
         db.session.add_all(items)
         db.session.commit()
     return 'timesheets commit successfully.'

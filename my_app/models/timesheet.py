@@ -27,7 +27,8 @@ class Timesheet(db.Model):
     date = db.Column(db.DATE, default=datetime.now)
     airplane = db.Column(db.UnicodeText(64), nullable=False)
     task = db.Column(db.UnicodeText(64), nullable=False)
-    tasktime = db.Column(db.Float, default=1)
+    calculated_time = db.Column(db.Float, default=1)
+    completed = db.Column(db.Enum(u'全部完成', u'部分完成'), default=u'全部完成')
     belongto_team = db.Column(db.UnicodeText(64),
                               nullable=False,
                               default=u'其他')
@@ -36,28 +37,29 @@ class Timesheet(db.Model):
                      default=u'例行')
     approved = db.Column(db.Enum(u'是', u'否'), nullable=False, default=u'否')
 
-    def __init__(self, name, number, date, airplane, task, tasktime,
-                 belongto_team, kind, approved):
+    def __init__(self, name, number, date, airplane, task, calculated_time,
+                 completed, belongto_team, kind, approved):
         self.name = name
         self.number = number
         self.date = date
         self.airplane = airplane
         self.task = task
-        self.tasktime = tasktime
+        self.calculated_time = calculated_time
+        self.completed = completed
         self.belongto_team = belongto_team
         self.kind = kind
         self.approved = approved
 
     def __repr__(self):
         return u'<Timesheet{0}: {1}-{2}>'.format(self.name, self.task,
-                                                 self.tasktime)
+                                                 self.calculated_time)
 
 
 class TimesheetModelView(ModelView):
 
     edit_modal = True
 
-    column_editable_list = ('task', 'tasktime', 'kind', 'approved')
+    column_editable_list = ('task', 'calculated_time', 'kind', 'approved')
 
     column_searchable_list = ('name', 'task', 'approved')
 
@@ -68,7 +70,8 @@ class TimesheetModelView(ModelView):
                          date=u'日期',
                          airplane=u'飞机',
                          task=u'工作名称',
-                         tasktime=u'工时',
+                         calculated_time=u'工时',
+                         completed=u'完成情况',
                          belongto_team=u'班组',
                          kind=u'工作类别',
                          approved=u'是否审核')
@@ -80,7 +83,7 @@ class TimesheetModelView(ModelView):
     def create_model(self, form):
         model = self.model(form.name.data, form.number.data, form.date.data,
                            form.airplane.data, form.task.data,
-                           form.tasktime.data, form.kind.data,
+                           form.calculated_time.data, form.kind.data,
                            form.approved.data)
         form.populate_obj(model)
         self.session.add(model)
@@ -97,7 +100,7 @@ class PendingApprovedModelView(ModelView):
 
     edit_modal = True
 
-    column_editable_list = ('task', 'tasktime', 'kind', 'approved')
+    column_editable_list = ('task', 'calculated_time', 'kind', 'approved')
 
     column_searchable_list = ('name', 'task', 'approved', 'belongto_team')
 
@@ -108,7 +111,7 @@ class PendingApprovedModelView(ModelView):
                          date=u'日期',
                          airplane=u'飞机',
                          task=u'工作名称',
-                         tasktime=u'工时',
+                         calculated_time=u'工时',
                          belongto_team=u'班组',
                          kind=u'工作类别',
                          approved=u'是否审核')
