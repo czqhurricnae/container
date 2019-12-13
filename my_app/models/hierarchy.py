@@ -79,26 +79,32 @@ class Worker(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.UnicodeText(64), nullable=False)
-    number = db.Column(db.Integer, nullable=False)
+    number = db.Column(db.Integer, nullable=True)
+    openId = db.Column(db.UnicodeText, nullable=True)
     major = db.Column(db.Enum(u'机械', u'电子', u'结构', u'电气'),
-                      nullable=False,
+                      nullable=True,
                       default=u'机械')
     post = db.Column(db.Enum(u'经理', u'高级主管领班', u'高级领班', u'领班', u'技师', u'维修员',
                              u'新员'),
-                     nullable=False,
+                     nullable=True,
                      default=u'维修员')
     authority = db.Column(db.Enum(u'管理者', u'普通用户'),
-                          nullable=False,
+                          nullable=True,
                           default=u'普通用户')
-    department_id = db.Column(db.Integer, db.ForeignKey('departments.id'))
-    Workshop_id = db.Column(db.Integer, db.ForeignKey('workshops.id'))
-    team_id = db.Column(db.Integer, db.ForeignKey('teams.id'))
+    department_id = db.Column(db.Integer,
+                              db.ForeignKey('departments.id'),
+                              nullable=True)
+    Workshop_id = db.Column(db.Integer,
+                            db.ForeignKey('workshops.id'),
+                            nullable=True)
+    team_id = db.Column(db.Integer, db.ForeignKey('teams.id'), nullable=True)
 
-    def __init__(self, name, number, major, post, authority,
+    def __init__(self, name, number, openId, major, post, authority,
                  belongto_department, belongto_workshop, belongto_team):
         self.name = name
         self.number = number
-        self.major = (major)
+        self.openId = openId
+        self.major = major
         self.post = post
         self.authority = authority
         self.belongto_department = belongto_department
@@ -168,6 +174,7 @@ class WorkerModelView(ModelView):
 
     column_labels = dict(name=u'姓名',
                          number=u'工号',
+                         openId='openId',
                          major=u'专业',
                          post=u'职位',
                          authority=u'管理权限',

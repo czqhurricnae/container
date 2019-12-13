@@ -134,15 +134,31 @@ class UserInfoAPI(Resource):
         if APP_ID and session_key and encrypted_data and iv:
             crypt = WXBizDataCrypt(APP_ID, session_key)
             user_info = crypt.decrypt(encrypted_data, iv)
-            print(type(user_info.get('nickName')))
-            if user_info.get('nickName', None):
+            if user_info.get(u'openId', None):
                 worker = Worker.query.filter_by(
-                    name=user_info['nickName']).first()
-                if worker:
+                    openId=user_info['openId']).first()
+                if worker and worker.number and worker.belongto_team:
                     user_info.update(number=worker.number,
                                      authority=worker.authority,
                                      belongto_team=str(worker.belongto_team),
+                                     binded=True,
                                      login=True)
+                elif worker:
+                    user_info.update(binded=False, login=True)
+                # XXX: 没有 openId 对应的记录则返回 None.
+                elif worker is None:
+                    new_worker = Worker(name=user_info.get('nickName'),
+                                        number=None,
+                                        openId=user_info.get('openId'),
+                                        major=None,
+                                        post=None,
+                                        authority=u'普通用户',
+                                        belongto_department=None,
+                                        belongto_workshop=None,
+                                        belongto_team=None)
+                    db.session.add(new_worker)
+                    db.session.commit()
+                    user_info.update(binded=False, login=True)
             return jsonify(user_info)
 
 
