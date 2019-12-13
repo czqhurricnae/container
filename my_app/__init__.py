@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from flask import Flask, url_for, session
+from flask import Flask, url_for, session, request, render_template, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import container_whooshalchemyplus
 from flask_admin import Admin, BaseView, expose, AdminIndexView
@@ -98,6 +98,8 @@ def create_app():
     app.register_blueprint(admin_blueprint)
     app.register_blueprint(documents_blueprint)
 
+    register_errors(app)
+
     db.init_app(app)
     with app.app_context():
         db.create_all()
@@ -194,3 +196,16 @@ Set it to True to suppress this warning.')
 Actually, application not registered on db instance and no application bound to current context,
 used in factory method to initialize the app `db.init_app(app)`.
 """
+
+
+def register_errors(app):
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        print('{!s}: {!s}'.format('__init__.py', '204'))
+        print(request.accept_mimetypes)
+        response = jsonify(code=500,
+                           message='An internal server error occurred.')
+        response.status_code = 500
+        return response
+        return render_template('errors.html', code=500,
+                               info='Server Error'), 500
