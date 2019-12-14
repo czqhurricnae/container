@@ -187,9 +187,9 @@ class WorkerModelView(ModelView):
         return form_class
 
     def create_model(self, form):
-        model = self.model(form.name.data, form.number.data, form.major.data,
-                           form.post.data, form.authority.data,
-                           form.belongto_department.data,
+        model = self.model(form.name.data, form.number.data, form.openId.data,
+                           form.major.data, form.post.data,
+                           form.authority.data, form.belongto_department.data,
                            form.belongto_workshop.data,
                            form.belongto_team.data)
         form.populate_obj(model)
