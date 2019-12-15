@@ -1,10 +1,11 @@
 # -*- coding:utf-8 -*-
-from flask import url_for, redirect, request
+from flask import url_for, redirect, request, flash
 from jieba.analyse import ChineseAnalyzer
 from flask_admin import expose
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.form import rules
 from flask_admin.actions import action
+from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 import json
 from .. import db
@@ -19,12 +20,13 @@ class StandardTime(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.UnicodeText(64), nullable=False)
-    tasktime = db.Column(db.Float, default=1)
-    kind = db.Column(db.Enum(u'例行', u'非例行排故', u'车间杂项', u'其他'), nullable=False)
+    tasktime = db.Column(db.Float, default=1.0)
+    kind = db.Column(db.Enum(u'例行', u'非例行排故', u'车间杂项', u'其他', u'勤务'),
+                     nullable=False)
     airplane_type = db.Column(db.Enum('737', '787', '7M8', '757', u'通用'),
                               default='737')
     worker_number = db.Column(db.Integer, default=1)
-    description = db.Column(db.UnicodeText(64), nullable=True)
+    description = db.Column(db.UnicodeText(), nullable=True)
 
     def __init__(self, title, tasktime, kind, airplane_type, worker_number,
                  description):
@@ -120,7 +122,7 @@ class StandardTimeModelView(ModelView):
         if uploaded_file:
             try:
                 items = json.loads(uploaded_file.read().decode('utf-8'))
-            except (json.JSONDecodeError, TypeError, UnicodeDecodeError) as e:
+            except (ValueError, TypeError, UnicodeDecodeError) as e:
                 flash(u'无法从文件读取 json 数据!', 'error')
                 return redirect_response
 
@@ -134,6 +136,10 @@ class StandardTimeModelView(ModelView):
                                  worker_number=item.get('worker_item'),
                                  description=item.get('description')))
             db.session.add_all(standard_times)
-            db.session.commit()
-
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                flash(u'导入数据库失败! 请检查数据或者数据库字段定义是否正确!', 'error')
+        flash(u'导入数据库成功.', 'success')
         return redirect_response
