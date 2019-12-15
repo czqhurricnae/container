@@ -9,7 +9,7 @@ from .models.tool import Tool, Project
 from .models.document import Document
 from .models.standard import StandardTime
 from .models.advise import Advise
-from .models.hierarchy import Worker
+from .models.hierarchy import Team, Worker
 from .models.timesheet import Timesheet
 from my_app import db
 
@@ -35,6 +35,11 @@ tasks_resource_fields = {
     'id': fields.Integer,
     'tasktime': fields.Float,
     'kind': fields.String,
+}
+
+teams_resource_fields = {
+    'id': fields.Integer,
+    'name': fields.String,
 }
 
 parser = reqparse.RequestParser()
@@ -216,3 +221,9 @@ class TasksAPI(Resource):
     @marshal_with(tasks_resource_fields)
     def get(self):
         return [task for task in StandardTime.query.all()]
+
+
+class TeamsAPI(Resource):
+    @marshal_with(teams_resource_fields)
+    def get(self):
+        return [team for team in Team.query.all()]
