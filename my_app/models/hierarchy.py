@@ -79,8 +79,8 @@ class Worker(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.UnicodeText(64), nullable=False)
-    number = db.Column(db.Integer, nullable=True)
-    openId = db.Column(db.UnicodeText, nullable=True)
+    number = db.Column(db.Integer, unique=True, nullable=True)
+    openId = db.Column(db.UnicodeText, unique=True, nullable=True)
     major = db.Column(db.Enum(u'机械', u'电子', u'结构', u'电气'),
                       nullable=True,
                       default=u'机械')
