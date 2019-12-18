@@ -12,6 +12,7 @@ from my_app.models.document import Document
 from my_app.models.advise import Advise
 from my_app.models.hierarchy import Team, Worker
 # from my_app.scrapper import Scrapper
+from my_app.fakes import fake_timesheets
 
 jieba.load_userdict(u'userdict.txt')
 
@@ -28,7 +29,8 @@ def _make_context():
                 Document=Document,
                 Advise=Advise,
                 Team=Team,
-                Worker=Worker)
+                Worker=Worker,
+                fake=fake_timesheets)
 
 
 manager.add_command('shell', Shell(make_context=_make_context))
@@ -38,3 +40,4 @@ whoosh_index(app, Document)
 
 if __name__ == '__main__':
     manager.run()
+    # app.run(debug=False)
