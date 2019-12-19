@@ -359,11 +359,24 @@ class TeamsAPI(Resource):
         result = dict()
         if workers:
             for worker in workers:
-                result[worker.id] = worker.name
+                result[worker.number] = worker.name
         return jsonify(result)
 
 
-class TimesheetAPI(Resource):
+class TimesheetsAPI(Resource):
     @marshal_with(timesheet_resource_fields)
     def get(self):
         return [timesheet for timesheet in Timesheet.query.all()]
+
+    @marshal_with(timesheet_resource_fields)
+    def post(self):
+        args = parser.parse_args()
+        number = args.get('number', None)
+
+        try:
+            number = int(number)
+        except (UnicodeEncodeError, ValueError, TypeError) as e:
+            return api_abort(400, e.args[0])
+
+        timesheets = Timesheet.query.filter_by(number=number).all()
+        return timesheets

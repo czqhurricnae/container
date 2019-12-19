@@ -66,7 +66,7 @@ def advise():
 def timesheets():
     from my_app.models.timesheet import Timesheet, db
     if request.method == 'POST':
-        timesheets = request.get_json().get(u'timesheets')
+        timesheets = request.get_json().get('timesheets')
         items = []
         for timesheet in timesheets:
             items.append(

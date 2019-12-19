@@ -182,5 +182,5 @@ class StatisticsView(BaseView):
     @expose('/', methods=['GET', 'POST'])
     def index_view(self):
         return self.render('admin/model/statistics.html',
-                           title=u'工时统计',
+                           title=u'工时查看',
                            API='/api/statistics')
