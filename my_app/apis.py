@@ -170,7 +170,6 @@ class UserInfoAPI(Resource):
                 return api_abort(400, e.args[0], binded=False, login=False)
 
             if openId:
-                print('{!s}: {!s}'.format('apis.py', '160'), openId)
                 worker = Worker.query.filter_by(openId=openId).first()
                 if worker and worker.number and worker.belongto_team:
                     user_info.update(number=worker.number,
@@ -344,8 +343,24 @@ class TeamsAPI(Resource):
     def get(self):
         result = dict()
         for team in Team.query.all():
-            result[team.name] = team.id
-        return result
+            result[team.id] = team.name
+        return jsonify(result)
+
+    def post(self):
+        args = parser.parse_args()
+        teamID = args.get('teamID', None)
+
+        try:
+            team_id = int(teamID)
+        except (UnicodeEncodeError, ValueError, TypeError) as e:
+            return api_abort(400, e.args[0])
+
+        workers = Worker.query.filter_by(team_id=team_id).all()
+        result = dict()
+        if workers:
+            for worker in workers:
+                result[worker.id] = worker.name
+        return jsonify(result)
 
 
 class TimesheetAPI(Resource):

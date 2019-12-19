@@ -16,6 +16,24 @@
 <div class="container" style="padding: 10px; ">
   <h3>{{title}}</h3>
   <br/>
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <label for="teams">班组</label>
+      <select class="form-control form-control-sm" id="team-category" name="team-category" onChange="changeTeam()">
+      </select>
+      <div class="invalid-feedback">
+        点此选择一个班组
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label for="workers">班组</label>
+      <select class="form-control form-control-sm" id="worker" name="worker">
+      </select>
+      <div class="invalid-feedback">
+        点此选择一个组员
+      </div>
+    </div>
+  </div>
   <div id="toolbar"></div>
   <table
     id="table"
@@ -54,11 +72,11 @@
 
  function airplaneFormatter () {
    return '总计'
- }
+ };
 
  function taskFormatter (data) {
    return data.length + ' 项'
- }
+ };
 
  function calculatedTimeFormatter (data) {
    var field = this.field
@@ -67,6 +85,65 @@
    }).reduce(function (sum, item) {
      return sum + item
    }, 0 )
+ };
+</script>
+<script>
+ $(window).load(function () {
+   $(function () {
+     $.getJSON(
+       '/api/teams',
+       function (data) {
+         var teamCategory = document.getElementById('team-category');
+
+         teamMaps = Object.entries(data);
+         if (teamMaps.length > 0) {
+           var newOption = document.createElement('option');
+           newOption.appendChild(document.createTextNode('请选择...'));
+           teamCategory.appendChild(newOption);
+           teamMaps.map((item, index, array) => {
+             var newOption = document.createElement('option');
+             newOption.appendChild(document.createTextNode(item[1]));
+             newOption.setAttribute('value', item[0]);
+             teamCategory.appendChild(newOption);
+           })
+         }
+       }
+     )
+   });
+ });
+
+ function changeTeam () {
+   var workers = document.getElementById('worker');
+   var teamCategory = document.getElementById('team-category');
+
+   while (workers.options.length) {
+     workers.remove(0);
+   }
+
+   if (teamCategory.selectedIndex !== 0) {
+     var selectTeam = teamCategory.options[teamCategory.selectedIndex].value;
+
+     $.post(
+       '/api/teams',
+       {
+         teamID:selectTeam
+       },
+       function (data) {
+
+         workerMaps = Object.entries(data);
+         if (workerMaps.length > 0) {
+           var newOption = document.createElement('option');
+           newOption.appendChild(document.createTextNode('请选择...'));
+           workers.appendChild(newOption);
+           workerMaps.map((item, index, array) => {
+             var newOption = document.createElement('option');
+             newOption.appendChild(document.createTextNode(item[1]));
+             newOption.setAttribute('value', item[0]);
+             workers.appendChild(newOption);
+           })
+         }
+       })
+   }
  }
 </script>
 <script src="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.js"></script>

@@ -19,7 +19,7 @@
                     {
                         search:JSON.stringify(search)
                     },
-                    function(data)
+                    function (data)
                     {
                         var projects_tools = data.result.projects_tools;
 
@@ -38,7 +38,7 @@
                     var total_replaced_str = '';
                     var project_number = '';
                     var message = '已查询到i个相关结果';
-                    $.each(projects_tools, function(index, item)
+                    $.each(projects_tools, function (index, item)
                     {
                         var tools = '';
                         var raw_str = '<div class = "panel panel-primary" >' +
@@ -107,7 +107,7 @@
 
         });
 
-        function doUnfold(obj)
+        function doUnfold (obj)
         {
             var unfold_id = $(obj).attr('id');
             var project_id = unfold_id.slice(7,20)
@@ -121,7 +121,7 @@
             document.getElementById(project_id).style.display = 'inline';
         }
 
-        function doCallapse(obj)
+        function doCallapse (obj)
         {
             var callapse_id = $(obj).attr('id');
             var project_id = callapse_id.slice(9, 20);
@@ -135,7 +135,7 @@
             document.getElementById(project_id).style.display = 'none';
         }
 
-        function doAdvise(obj)
+        function doAdvise (obj)
         {
             var submit_id = $(obj).attr('id');
             var project_id = submit_id.slice(7, 20);
@@ -147,7 +147,7 @@
                     advise:JSON.stringify("{'project_id':'"+project_id+"',"+"'name':'anonimity',"+"'advise':'"+advise+"'}")
 
                 },
-                function(data)
+                function (data)
                 {
                     // TODO:
                 }
