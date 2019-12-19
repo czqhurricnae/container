@@ -19,7 +19,7 @@ def fake_timesheets(count=100):
                                                      stop=date(year=2019,
                                                                month=12,
                                                                day=30)),
-                              airplane=unicode(random.randint(2760, 9999),
+                              airplane=unicode(str(random.randint(2760, 9999)),
                                                'utf-8'),
                               task=task.title,
                               calculated_time=task.tasktime,

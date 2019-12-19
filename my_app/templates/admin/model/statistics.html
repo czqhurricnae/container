@@ -1,0 +1,73 @@
+{% extends 'admin/AdminLTE_base.html' %}
+
+{% block head_css %}
+{{ super() }}
+<style type='text/css'>
+ .row-index {
+   width: 50px;
+   display: inline-block;
+ }
+</style>
+<link href="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+{% endblock %}
+
+{% block body %}
+<div class="container" style="padding: 10px; ">
+  <h3>{{title}}</h3>
+  <br/>
+  <div id="toolbar"></div>
+  <table
+    id="table"
+    data-toggle="true"
+    data-toolbar="#toolbar"
+    data-search="true"
+    data-show-columns="true"
+    data-pagination="true"
+    data-height="600"
+    data-show-footer="true"
+    data-url={{ API }}>
+    <thead>
+      <tr>
+        <th data-field="name">工作者</th>
+        <th data-field="number">工号</th>
+        <th data-field="date">日期</th>
+        <th data-field="airplane" data-footer-formatter="airplaneFormatter">飞机</th>
+        <th data-field="task" data-footer-formatter="taskFormatter">工作名称</th>
+        <th data-field="calculated_time" data-footer-formatter="calculatedTimeFormatter">工时</th>
+        <th data-field="kind">工作类别</th>
+      </tr>
+    </thead>
+  </table>
+</div>
+{% endblock body %}
+
+{% block tail_js %}
+{{ super() }}
+<script type='text/javascript'>
+ $(window).load(function ()
+   {
+     $(function () {
+       $('#table').bootstrapTable({});
+     });
+   });
+
+ function airplaneFormatter () {
+   return '总计'
+ }
+
+ function taskFormatter (data) {
+   return data.length + ' 项'
+ }
+
+ function calculatedTimeFormatter (data) {
+   var field = this.field
+   return '统计工时: ' + data.map(function (row) {
+     return row[field]
+   }).reduce(function (sum, item) {
+     return sum + item
+   }, 0 )
+ }
+</script>
+<script src="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.js"></script>
+{% endblock tail_js%}

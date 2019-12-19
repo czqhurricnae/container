@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 from flask import url_for, flash, redirect, request
 from jieba.analyse import ChineseAnalyzer
-from flask_admin import expose
+from flask_admin import expose, BaseView
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.sqla.filters import BaseSQLAFilter, FilterEqual
 from flask_admin.model.template import EndpointLinkRowAction
@@ -32,7 +32,7 @@ class Timesheet(db.Model):
     belongto_team = db.Column(db.UnicodeText(64),
                               nullable=False,
                               default=u'其他')
-    kind = db.Column(db.Enum(u'例行', u'非例行', u'车间杂项', u'排故', u'其他'),
+    kind = db.Column(db.Enum(u'例行', u'非例行排故', u'车间杂项', u'其他', u'勤务'),
                      nullable=False,
                      default=u'例行')
     approved = db.Column(db.Enum(u'是', u'否'), nullable=False, default=u'否')
@@ -154,7 +154,7 @@ class PendingApprovedModelView(ModelView):
     @expose('/approve/', methods=('GET', ))
     def approve_view(self):
         """
-            Activate user model view. Only GET method is allowed.
+            Approve user model view. Only GET method is allowed.
         """
         return_url = get_redirect_target() or self.get_url(
             'timesheet.details_view')
@@ -176,3 +176,11 @@ class PendingApprovedModelView(ModelView):
 
         flash(u'已审核', u'success')
         return redirect(return_url)
+
+
+class StatisticsView(BaseView):
+    @expose('/', methods=['GET', 'POST'])
+    def index_view(self):
+        return self.render('admin/model/statistics.html',
+                           title=u'工时统计',
+                           API='/api/statistics')

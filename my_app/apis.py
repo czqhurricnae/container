@@ -44,6 +44,18 @@ teams_resource_fields = {
     'name': fields.String,
 }
 
+timesheet_resource_fields = {
+    'name': fields.String,
+    'number': fields.Integer,
+    'date': fields.String,
+    'airplane': fields.String,
+    'task': fields.String,
+    'calculated_time': fields.Float,
+    'completed': fields.String,
+    'kind': fields.String,
+    'approved': fields.String
+}
+
 parser = reqparse.RequestParser()
 parser.add_argument('search')
 parser.add_argument('code', type=str, help='code must be a string.')
@@ -334,3 +346,9 @@ class TeamsAPI(Resource):
         for team in Team.query.all():
             result[team.name] = team.id
         return result
+
+
+class TimesheetAPI(Resource):
+    @marshal_with(timesheet_resource_fields)
+    def get(self):
+        return [timesheet for timesheet in Timesheet.query.all()]
