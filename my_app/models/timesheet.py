@@ -7,6 +7,7 @@ from flask_admin.contrib.sqla.filters import BaseSQLAFilter, FilterEqual
 from flask_admin.model.template import EndpointLinkRowAction
 from flask_admin.helpers import get_redirect_target, flash_errors
 from flask_admin.form import rules
+from flask_admin.actions import action
 from sqlalchemy import func
 from flask_babel import gettext
 from datetime import datetime
@@ -176,6 +177,27 @@ class PendingApprovedModelView(ModelView):
 
         flash(u'已审核', u'success')
         return redirect(return_url)
+
+    @action('approve', u'审核', u'你确定要将所选择的项目设置为已审核?')
+    def action_approve(self, ids):
+        redirect_response = redirect(url_for('timesheet.index_view'))
+        try:
+            query = Timesheet.query.filter(Timesheet.id.in_(ids))
+
+            count = 0
+            for timesheet in query.all():
+                if timesheet.approved == u'是':
+                    pass
+                else:
+                    timesheet.approved = u'是'
+                    count += 1
+            db.session.commit()
+            flash(u'审核 {} 个工时成功.'.format(count), 'success')
+            return redirect_response
+        except Exception as e:
+            if not self.handle_view_exception(e):
+                raise
+            flash(u'审核失败:{}'.format(str(e)), 'error')
 
 
 class ApprovedTimesheetView(BaseView):

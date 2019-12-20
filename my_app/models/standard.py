@@ -133,7 +133,7 @@ class StandardTimeModelView(ModelView):
                                  tasktime=item.get('tasktime'),
                                  kind=item.get('kind'),
                                  airplane_type=item.get('airplane_type'),
-                                 worker_number=item.get('worker_item'),
+                                 worker_number=item.get('worker_number'),
                                  description=item.get('description')))
             db.session.add_all(standard_times)
             try:
