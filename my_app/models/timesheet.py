@@ -178,9 +178,9 @@ class PendingApprovedModelView(ModelView):
         return redirect(return_url)
 
 
-class StatisticsView(BaseView):
+class ApprovedTimesheetView(BaseView):
     @expose('/', methods=['GET', 'POST'])
     def index_view(self):
-        return self.render('admin/model/statistics.html',
-                           title=u'工时查看',
-                           API='/api/statistics')
+        return self.render('admin/model/approved_timesheets_list.html',
+                           title=u'已核工时查看',
+                           API='/api/approvedTimesheets')

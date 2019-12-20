@@ -1,0 +1,301 @@
+{% extends 'admin/AdminLTE_base.html' %}
+
+{% block head_css %}
+{{ super() }}
+<style type='text/css'>
+ .row-index {
+   width: 50px;
+   display: inline-block;
+ }
+</style>
+<link href="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+{% endblock %}
+
+{% block body %}
+<div class="container" style="padding: 10px; ">
+  <h3>{{title}}</h3>
+  <br/>
+  <div class="row">
+    <div class="col-md-3 mb-3">
+      <label for="teams">班组</label>
+      <select class="form-control form-control-sm" id="team-category" name="team-category" onChange="selectTeam()">
+      </select>
+      <div class="invalid-feedback">
+        点此选择一个班组
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <label for="workers">员工</label>
+      <select class="form-control form-control-sm" id="worker" name="worker" onChange="selectWorker()">
+      </select>
+      <div class="invalid-feedback">
+        点此选择一个员工
+      </div>
+    </div>
+  </div>
+  <div id="toolbar" class="select">
+    <select class="form-control">
+      <option value="">导出本页</option>
+      <option value="all">导出所有的</option>
+      <option value="selected">导出选择的</option>
+    </select>
+    <div class="invalid-feedback">
+      点此选择导出范围
+    </div>
+  </div>
+  <table
+    id="table"
+    data-toolbar="#toolbar"
+    data-show-export="true"
+    data-show-columns="true"
+    data-click-to-select="true"
+    data-show-toggle="true"
+    data-search="true"
+    data-show-columns="true"
+    data-pagination="true"
+    data-height="600"
+    data-show-footer="true"
+  >
+  </table>
+</div>
+{% endblock body %}
+
+{% block tail_js %}
+{{ super() }}
+<script type='text/javascript'>
+ $(window).load(function ()
+   {
+     $(function () {
+       $('#table').bootstrapTable({});
+     });
+   });
+</script>
+<script>
+ function airplaneFormatter () {
+   return '总计'
+ };
+
+ function taskFormatter (data) {
+   return data.length + ' 项'
+ };
+
+ function calculatedTimeFormatter (data) {
+   var field = this.field
+   return '总计工时: ' + data.map(function (row) {
+     return row[field]
+   }).reduce(function (sum, item) {
+     return sum + item
+   }, 0 )
+ };
+
+ function post (URL, query) {
+   return $.post(
+     URL,
+     query
+   );
+ };
+
+ function resetSelectToExport () {
+   $('.select').each(function (index, item) {
+     $(item).find('option:selected').attr('selected', false);
+     $(item).find('option').first().attr('selected', true);
+   });
+ };
+
+ $(window).load(function () {
+   $(function () {
+     $.getJSON(
+       '/api/teams',
+       function (data) {
+         var teamCategory = document.getElementById('team-category');
+         var teamMaps = Object.entries(data);
+
+         if (teamMaps.length > 0) {
+           var newOption = document.createElement('option');
+
+           newOption.appendChild(document.createTextNode('请选择...'));
+           teamCategory.appendChild(newOption);
+
+           teamMaps.map((item, index, array) => {
+             var newOption = document.createElement('option');
+
+             newOption.appendChild(document.createTextNode(item[1]));
+             newOption.setAttribute('value', item[0]);
+             teamCategory.appendChild(newOption);
+           })
+         }
+       }
+     )
+   });
+ });
+
+ function selectTeam () {
+   var workers = document.getElementById('worker');
+   var teamCategory = document.getElementById('team-category');
+
+   while (workers.options.length) {
+     workers.remove(0);
+   }
+
+   if (teamCategory.selectedIndex > 0 && teamCategory.options.length !== 0) {
+     var selectTeam = teamCategory.options[teamCategory.selectedIndex].value;
+
+     post('/api/teams', {teamID: selectTeam}).
+       done(function (data) {
+         var workerMaps = Object.entries(data);
+         if (workerMaps.length > 0) {
+           var newOption = document.createElement('option');
+
+           newOption.appendChild(document.createTextNode('请选择...'));
+           workers.appendChild(newOption);
+
+           workerMaps.map((item, index, array) => {
+             var newOption = document.createElement('option');
+
+             newOption.appendChild(document.createTextNode(item[1]));
+             newOption.setAttribute('value', item[0]);
+             workers.appendChild(newOption);
+           })
+         }
+       });
+   }
+ }
+
+ function selectWorker () {
+   var workers = document.getElementById('worker');
+   var exportDataType = $('.select').val();
+
+   if (workers.selectedIndex > 0 && workers.options.length !== 0) {
+     var selectWorker = workers.options[workers.selectedIndex].value;
+
+     // XXX:重置导出下拉栏.
+     resetSelectToExport();
+
+     post('/api/approvedTimesheets', {number: selectWorker}).
+       done(function (data) {
+         var modifiedData = $.each(data, function (index, item) {
+           item.state= false;
+         });
+
+         $('#table').bootstrapTable('destroy').bootstrapTable({
+           pageSize: 50,
+           data:modifiedData,
+           columns: [{
+             field: 'state',
+             checkbox: true,
+             visible: exportDataType == 'selected',
+           }, {
+             field: 'name',
+             title: '工作者',
+             sortable: true,
+           }, {
+             field: 'number',
+             title: '工号',
+             sortable: true,
+           }, {
+             field: 'date',
+             title: '日期',
+             sortable: true,
+           }, {
+             field: 'airplane',
+             title: '飞机',
+             sortable: true,
+             footerFormatter: airplaneFormatter,
+           }, {
+             field: 'task',
+             title: '工作名称',
+             sortable: false,
+             footerFormatter: taskFormatter,
+           }, {
+             field: 'calculated_time',
+             title: '工时',
+             sortable: true,
+             footerFormatter: calculatedTimeFormatter,
+           }, {
+             field: 'kind',
+             title: '工作类别',
+             sortable: true,
+           }, {
+             field: 'approved',
+             title: '是否审核',
+             sortable: true,
+           }]
+         });
+       }
+       );
+   }
+ };
+
+ $(function () {
+   $('#toolbar').find('select').change(function () {
+     var workers = document.getElementById('worker');
+     var exportDataType = $(this).val();
+
+     if (workers.selectedIndex >0  && workers.options.length !== 0) {
+       var selectWorker = workers.options[workers.selectedIndex].value;
+
+       post('/api/approvedTimesheets', {number: selectWorker}).
+         then(function (data) {
+           var modifiedData = $.each(data, function (index, item) {
+             item.state= false;
+           });
+
+           $('#table').bootstrapTable('destroy').bootstrapTable({
+             exportDataType: exportDataType,
+             exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'pdf'],
+             pageSize: 50,
+             data: modifiedData,
+             columns: [{
+               field: 'state',
+               checkbox: true,
+               visible: exportDataType == 'selected',
+             }, {
+               field: 'name',
+               title: '工作者',
+               sortable: true,
+             }, {
+               field: 'number',
+               title: '工号',
+               sortable: true,
+             }, {
+               field: 'date',
+               title: '日期',
+               sortable: true,
+             }, {
+               field: 'airplane',
+               title: '飞机',
+               sortable: true,
+               footerFormatter: airplaneFormatter,
+             }, {
+               field: 'task',
+               title: '工作名称',
+               sortable: false,
+               footerFormatter: taskFormatter,
+             }, {
+               field: 'calculated_time',
+               title: '工时',
+               sortable: true,
+               footerFormatter: calculatedTimeFormatter,
+             }, {
+               field: 'kind',
+               title: '工作类别',
+               sortable: true,
+             }, {
+               field: 'approved',
+               title: '是否审核',
+               sortable: true,
+             }]
+           });
+         }
+       );
+     }
+   }).trigger('change');
+ });
+</script>
+<script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
+<script src="https://unpkg.com/tableexport.jquery.plugin/libs/jsPDF/jspdf.min.js"></script>
+<script src="https://unpkg.com/tableexport.jquery.plugin/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.15.5/dist/extensions/export/bootstrap-table-export.min.js"></script>
+{% endblock tail_js%}

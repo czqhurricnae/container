@@ -363,10 +363,12 @@ class TeamsAPI(Resource):
         return jsonify(result)
 
 
-class TimesheetsAPI(Resource):
+class ApprovedTimesheetAPI(Resource):
     @marshal_with(timesheet_resource_fields)
     def get(self):
-        return [timesheet for timesheet in Timesheet.query.all()]
+        return [
+            timesheet for timesheet in Timesheet.query.filter_by(approved=u'是')
+        ]
 
     @marshal_with(timesheet_resource_fields)
     def post(self):
@@ -378,5 +380,6 @@ class TimesheetsAPI(Resource):
         except (UnicodeEncodeError, ValueError, TypeError) as e:
             return api_abort(400, e.args[0])
 
-        timesheets = Timesheet.query.filter_by(number=number).all()
+        timesheets = Timesheet.query.filter_by(number=number,
+                                               approved=u'是').all()
         return timesheets
