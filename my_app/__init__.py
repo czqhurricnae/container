@@ -65,7 +65,7 @@ def create_app():
     from .models.hierarchy import Department, Workshop, Team, Worker, DepartmentModelView, WorkshopModelView, TeamModelView, WorkerModelView
     from .models.standard import StandardTime, StandardTimeModelView
     from .models.timesheet import Timesheet, TimesheetModelView, PendingApprovedModelView, ApprovedTimesheetView
-    from apis import ProjectsAPI, segmentationsAPI, ToolsAPI, Code2sessionAPI, UserInfoAPI, UpdateUserInfoAPI, DocumentListAPI, DocumentAPI, TasksAPI, TeamsAPI, ApprovedTimesheetAPI
+    from apis import ProjectsAPI, SegmentationsAPI, ToolsAPI, Code2sessionAPI, UserInfoAPI, UpdateUserInfoAPI, DocumentListAPI, DocumentAPI, TasksAPI, TeamsAPI, ApprovedTimesheetsAPI
 
     app = Flask(__name__,
                 instance_path=INSTANCE_PATH,
@@ -175,7 +175,7 @@ def create_app():
 
     api = Api(app)
     api.add_resource(ProjectsAPI, '/api/projects')
-    api.add_resource(segmentationsAPI, '/api/segmentations')
+    api.add_resource(SegmentationsAPI, '/api/segmentations')
     api.add_resource(ToolsAPI, '/api/tools/<int:project_id>')
     api.add_resource(Code2sessionAPI, '/api/code2session')
     api.add_resource(UserInfoAPI, '/api/userInfo')
@@ -184,7 +184,7 @@ def create_app():
     api.add_resource(DocumentAPI, '/api/documents/<document_id>/')
     api.add_resource(TasksAPI, '/api/tasks')
     api.add_resource(TeamsAPI, '/api/teams')
-    api.add_resource(ApprovedTimesheetAPI, '/api/approvedTimesheets')
+    api.add_resource(ApprovedTimesheetsAPI, '/api/approvedTimesheets')
     return app
 
 

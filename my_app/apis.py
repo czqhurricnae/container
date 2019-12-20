@@ -4,6 +4,8 @@ from flask import jsonify, current_app
 from sqlalchemy.exc import IntegrityError
 import jieba
 import json
+from datetime import datetime, timedelta, date
+import itertools
 from weixin import WXAPPAPI
 from WXBizDataCrypt import WXBizDataCrypt
 from .models.tool import Tool, Project
@@ -71,6 +73,8 @@ parser.add_argument('nickName', type=str, help='nickName must be a string.')
 parser.add_argument('number', type=str, help='number must be a string.')
 parser.add_argument('openId', type=str, help='openId must be a string.')
 parser.add_argument('teamID', type=str, help='teamID must be a string.')
+parser.add_argument('startDate', type=str, help='startDate must be a string.')
+parser.add_argument('endDate', type=str, help='endDate must be a string.')
 
 
 class ProjectsAPI(Resource):
@@ -108,7 +112,7 @@ class ProjectsAPI(Resource):
         return results
 
 
-class segmentationsAPI(Resource):
+class SegmentationsAPI(Resource):
     def post(self):
         args = parser.parse_args()
         search = args.get('search', '')
@@ -363,7 +367,7 @@ class TeamsAPI(Resource):
         return jsonify(result)
 
 
-class ApprovedTimesheetAPI(Resource):
+class ApprovedTimesheetsAPI(Resource):
     @marshal_with(timesheet_resource_fields)
     def get(self):
         return [
@@ -374,12 +378,34 @@ class ApprovedTimesheetAPI(Resource):
     def post(self):
         args = parser.parse_args()
         number = args.get('number', None)
+        startDate = args.get('startDate', None)
+        endDate = args.get('endDate', None)
 
         try:
             number = int(number)
         except (UnicodeEncodeError, ValueError, TypeError) as e:
             return api_abort(400, e.args[0])
 
-        timesheets = Timesheet.query.filter_by(number=number,
-                                               approved=u'是').all()
-        return timesheets
+        if startDate and endDate:
+            try:
+                start_date = datetime.strptime(startDate, '%Y-%m-%d')
+                end_date = datetime.strptime(endDate, '%Y-%m-%d')
+            except (UnicodeEncodeError, ValueError, TypeError) as e:
+                return api_abort(400, e.args[0])
+
+            results = []
+            a_day = timedelta(days=1)
+            while start_date < end_date:
+                start_date += a_day
+                date_unicode = unicode(date.strftime(start_date, '%Y-%m-%d'),
+                                       'utf-8')
+                timesheets = Timesheet.query.filter_by(number=number,
+                                                       date=date_unicode,
+                                                       approved=u'是').all()
+                if timesheets:
+                    results = itertools.chain(results, timesheets)
+
+        else:
+            results = Timesheet.query.filter_by(number=number,
+                                                approved=u'是').all()
+        return list(results)
