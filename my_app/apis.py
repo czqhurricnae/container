@@ -39,6 +39,7 @@ tasks_resource_fields = {
     'id': fields.Integer,
     'tasktime': fields.Float,
     'kind': fields.String,
+    'worker_number': fields.Integer,
 }
 
 teams_resource_fields = {
@@ -55,7 +56,7 @@ timesheet_resource_fields = {
     'calculated_time': fields.Float,
     'completed': fields.String,
     'kind': fields.String,
-    'approved': fields.String
+    'approved': fields.String,
 }
 
 parser = reqparse.RequestParser()
