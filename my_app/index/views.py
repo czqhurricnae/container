@@ -104,13 +104,13 @@ def timesheets():
                               kind=kind,
                               belongto_team=belongto_team,
                               approved=approved))
-                try:
-                    db.session.add_all(items)
-                    db.session.commit()
-                    return jsonify({
-                        'message': 'Timesheets created.',
-                        'count': len(items)
-                    }), 201
-                except IntegrityError as e:
-                    db.session.rollback()
-                    return api_abort(409, e.args[0])
+        try:
+            db.session.add_all(items)
+            db.session.commit()
+            return jsonify({
+                'message': 'Timesheets created.',
+                'count': len(items)
+            }), 201
+        except IntegrityError as e:
+            db.session.rollback()
+            return api_abort(409, e.args[0])
