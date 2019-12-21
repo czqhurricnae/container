@@ -177,13 +177,17 @@ class UserInfoAPI(Resource):
             if openId:
                 worker = Worker.query.filter_by(openId=openId).first()
                 if worker and worker.number and worker.belongto_team:
-                    user_info.update(number=worker.number,
+                    # XXX: 用户如果绑定时已经修改过名称,则使用后台记录的名称,
+                    # 而非解析出来的名称.
+                    user_info.update(nickName=worker.name,
+                                     number=worker.number,
                                      authority=worker.authority,
                                      belongto_team=str(worker.belongto_team),
                                      binded=True,
                                      login=True)
                 elif worker:
-                    user_info.update(binded=False,
+                    user_info.update(nickName=worker.name,
+                                     binded=False,
                                      login=True,
                                      authority=worker.authority)
                 # XXX: 没有 openId 对应的记录则 SQLALchemy返回 None.
@@ -254,11 +258,14 @@ class UpdateUserInfoAPI(Resource):
             # XXX: 仅当后台有录入工号和名字, 用户首次绑定.
             if worker and worker.openId == u'':
                 try:
+                    # XXX: 用户小程序客户端的名称和后台登记的不一致,可以此时进行修改.
+                    worker.name = name
                     worker.openId = openId
                     worker.team_id = team_id
                     db.session.commit()
                     return jsonify({
                         'binded': True,
+                        'nickName': name,
                         'number': number,
                         'authority': worker.authority,
                         'belongto_team': belongto_team
@@ -267,18 +274,20 @@ class UpdateUserInfoAPI(Resource):
                     db.session.rollback()
                     return api_abort(400, e.args[0], binded=False)
             # XXX: 对于使用名字和工号无法查询到的, 可能是只开始使用小程序.
-            # 但是有一种情况: 后台记录用户的名字和工号和 openId, 但是用户需要
-            # 更改工号(第一次录入错误),更改班组.
+            # 但是有一种情况: 后台已经记录了用户的名字和工号和 openId,
+            #但是用户需要更改工号(第一次录入错误),更改班组.
             #  elif worker is None: 如此判断不够严谨.
             else:
                 worker = Worker.query.filter_by(openId=openId).first()
                 if worker:
                     try:
+                        worker.name = name
                         worker.number = number
                         worker.team_id = team_id
                         db.session.commit()
                         return jsonify({
                             'binded': True,
+                            'nickName': name,
                             'number': number,
                             'authority': worker.authority,
                             'belongto_team': belongto_team
