@@ -34,14 +34,37 @@
       </div>
     </div>
   </div>
-  <div id="toolbar" class="select">
-    <select class="form-control">
-      <option value="">导出本页</option>
-      <option value="all">导出所有的</option>
-      <option value="selected">导出选择的</option>
-    </select>
-    <div class="invalid-feedback">
-      点此选择导出范围
+
+  <div class="row">
+    <div class="col-md-3 mb-3">
+      <label for="filter">按日期过滤</label>
+      <form class="form-inline">
+        <div class="form-group input-daterange">
+          <input id="startDate" name="startDate" type="text" placeholder="开始日期" data-date-format="yyyy-mm-dd" class="form-control" />
+          <input id="endDate" name="endDate" type="text" placeholder="结束日期" data-date-format="yyyy-mm-dd" class="form-control" />
+        </div>
+        <div class="form-group">
+          <div class="input-bar-item">
+            <a href="#" class="btn btn-primary" role="button" id="filter">过滤</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 mb-3">
+      <label for="selector">导出</label>
+      <div id="toolbar" class="select">
+        <select class="form-control">
+          <option value="">导出本页</option>
+          <option value="all">导出所有的</option>
+          <option value="selected">导出选择的</option>
+        </select>
+        <div class="invalid-feedback">
+          点此选择导出范围
+        </div>
+      </div>
     </div>
   </div>
   <table
@@ -103,6 +126,18 @@
    });
  };
 
+ function getDates(startDate, endDate) {
+   var dateArray = [];
+   var currentDate = moment(startDate);
+   var endDate = moment(endDate);
+   while (currentDate <= endDate) {
+     dateArray.push(moment(currentDate).format('YYYY-MM-DD'));
+     currentDate = moment(currentDate).add(1, 'days');
+   }
+
+   return dateArray;
+ };
+
  $(window).load(function () {
    $(function () {
      $.getJSON(
@@ -160,7 +195,7 @@
          }
        });
    }
- }
+ };
 
  function selectWorker () {
    var workers = document.getElementById('worker');
@@ -288,14 +323,37 @@
              }]
            });
          }
-       );
+         );
      }
    }).trigger('change');
  });
+
+ $('#filter').click(function () {
+   var from = $('#startDate').val();
+   var to = $('#endDate').val();
+   $('#table').bootstrapTable('filterBy', {
+     date: getDates(from, to)
+   });
+ });
 </script>
+
 <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
 <script src="https://unpkg.com/tableexport.jquery.plugin/libs/jsPDF/jspdf.min.js"></script>
 <script src="https://unpkg.com/tableexport.jquery.plugin/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
 <script src="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.js"></script>
 <script src="https://unpkg.com/bootstrap-table@1.15.5/dist/extensions/export/bootstrap-table-export.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.zh-CN.min.js"></script>
+<script>
+ $('.input-daterange input').each(function () {
+   $(this).datepicker({
+     language: 'zh-CN', //语言
+     autoclose: true, //选择后自动关闭
+     clearBtn: true,//清除按钮
+     format: "yyyy-mm-dd"//日期格式
+   });
+ });
+</script>
 {% endblock tail_js%}
