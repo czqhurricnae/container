@@ -405,8 +405,7 @@ class ApprovedTimesheetsAPI(Resource):
 
             results = []
             a_day = timedelta(days=1)
-            while start_date < end_date:
-                start_date += a_day
+            while start_date <= end_date:
                 date_unicode = unicode(date.strftime(start_date, '%Y-%m-%d'),
                                        'utf-8')
                 timesheets = Timesheet.query.filter_by(number=number,
@@ -414,6 +413,7 @@ class ApprovedTimesheetsAPI(Resource):
                                                        approved=u'是').all()
                 if timesheets:
                     results = itertools.chain(results, timesheets)
+                start_date += a_day
 
         else:
             results = Timesheet.query.filter_by(number=number,
