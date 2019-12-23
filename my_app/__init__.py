@@ -64,8 +64,8 @@ def create_app():
     from .models.advise import Advise
     from .models.hierarchy import Department, Workshop, Team, Worker, DepartmentModelView, WorkshopModelView, TeamModelView, WorkerModelView
     from .models.standard import StandardTime, StandardTimeModelView
-    from .models.timesheet import Timesheet, TimesheetModelView, PendingApprovedModelView, ApprovedTimesheetView
-    from apis import ProjectsAPI, SegmentationsAPI, ToolsAPI, Code2sessionAPI, UserInfoAPI, UpdateUserInfoAPI, DocumentListAPI, DocumentAPI, TasksAPI, TeamsAPI, ApprovedTimesheetsAPI
+    from .models.timesheet import Timesheet, TimesheetModelView, PendingApprovedModelView, ApprovedTimesheetView, StatisticsTimesheetView
+    from apis import ProjectsAPI, SegmentationsAPI, ToolsAPI, Code2sessionAPI, UserInfoAPI, UpdateUserInfoAPI, DocumentListAPI, DocumentAPI, TasksAPI, TeamsAPI, ApprovedTimesheetsAPI, StatisticsAPI
 
     app = Flask(__name__,
                 instance_path=INSTANCE_PATH,
@@ -113,6 +113,7 @@ def create_app():
                                  name=u'工时审核',
                                  category=u'工时管理'))
     admin.add_view(ApprovedTimesheetView(name=u'已核工时查看', category=u'工时管理'))
+    admin.add_view(StatisticsTimesheetView(name=u'班组工时统计', category=u'工时管理'))
     admin.add_view(
         DepartmentModelView(model=Department,
                             session=db.session,
@@ -185,6 +186,7 @@ def create_app():
     api.add_resource(TasksAPI, '/api/tasks')
     api.add_resource(TeamsAPI, '/api/teams')
     api.add_resource(ApprovedTimesheetsAPI, '/api/approvedTimesheets')
+    api.add_resource(StatisticsAPI, '/api/statistics')
     return app
 
 

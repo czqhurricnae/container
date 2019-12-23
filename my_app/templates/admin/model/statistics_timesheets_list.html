@@ -21,31 +21,19 @@
       <label for="teams">班组</label>
       <select class="form-control form-control-sm" id="team-category" name="team-category" onChange="selectTeam()">
       </select>
-      <div class="invalid-feedback">
-        点此选择一个班组
-      </div>
-    </div>
-    <div class="col-md-3 mb-3">
-      <label for="workers">员工</label>
-      <select class="form-control form-control-sm" id="worker" name="worker" onChange="selectWorker()">
-      </select>
-      <div class="invalid-feedback">
-        点此选择一个员工
-      </div>
     </div>
   </div>
 
   <div class="row">
     <div class="col-md-3 mb-3">
-      <label for="filter">按日期过滤</label>
+      <label for="filter">月份</label>
       <form class="form-inline">
         <div class="form-group input-daterange">
-          <input id="startDate" name="startDate" type="text" placeholder="开始日期" data-date-format="yyyy-mm-dd" class="form-control" />
-          <input id="endDate" name="endDate" type="text" placeholder="结束日期" data-date-format="yyyy-mm-dd" class="form-control" />
+          <input id="month" name="month" type="text" placeholder="点击选择月份" data-date-format="yyyy-mm" class="form-control" />
         </div>
         <div class="form-group">
           <div class="input-bar-item">
-            <a href="#" class="btn btn-primary" role="button" id="filter">过滤</a>
+            <a href="#" class="btn btn-primary" role="button" id="filter">查看</a>
           </div>
         </div>
       </form>
@@ -126,18 +114,6 @@
    });
  };
 
- function getDates(startDate, endDate) {
-   var dateArray = [];
-   var currentDate = moment(startDate);
-   var endDate = moment(endDate);
-   while (currentDate <= endDate) {
-     dateArray.push(moment(currentDate).format('YYYY-MM-DD'));
-     currentDate = moment(currentDate).add(1, 'days');
-   }
-
-   return dateArray;
- };
-
  $(window).load(function () {
    $(function () {
      $.getJSON(
@@ -166,112 +142,83 @@
  });
 
  function selectTeam () {
-   var workers = document.getElementById('worker');
-   var teamCategory = document.getElementById('team-category');
+   resetSelectToExport();
+ };
 
-   while (workers.options.length) {
-     workers.remove(0);
-   }
+ $('#filter').click(function () {
+   var exportDataType = $('.select').val();
+   var teamCategory = document.getElementById('team-category');
+   var month = $('#month').val();
 
    if (teamCategory.selectedIndex > 0 && teamCategory.options.length !== 0) {
      var selectTeam = teamCategory.options[teamCategory.selectedIndex].value;
-
-     post('/api/teams', {teamID: selectTeam}).
-       done(function (data) {
-         var workerMaps = Object.entries(data);
-         if (workerMaps.length > 0) {
-           var newOption = document.createElement('option');
-
-           newOption.appendChild(document.createTextNode('请选择...'));
-           workers.appendChild(newOption);
-
-           workerMaps.map((item, index, array) => {
-             var newOption = document.createElement('option');
-
-             newOption.appendChild(document.createTextNode(item[1]));
-             newOption.setAttribute('value', item[0]);
-             workers.appendChild(newOption);
-           })
-         }
-       });
    }
- };
 
- function selectWorker () {
-   var workers = document.getElementById('worker');
-   var exportDataType = $('.select').val();
+   if (selectTeam && month) {
+     post('{{API}}', {teamID: selectTeam, yearAndMonth: month}).
+       then(function (data) {
 
-   if (workers.selectedIndex > 0 && workers.options.length !== 0) {
-     var selectWorker = workers.options[workers.selectedIndex].value;
-
-     // XXX:重置导出下拉栏.
-     resetSelectToExport();
-
-     post('{{API}}', {number: selectWorker}).
-       done(function (data) {
          var modifiedData = $.each(data, function (index, item) {
            item.state= false;
          });
 
          $('#table').bootstrapTable('destroy').bootstrapTable({
-           pageSize: 50,
-           data:modifiedData,
+           exportDataType: exportDataType,
+           exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'pdf'],
+           pageSize: 20,
+           data: modifiedData,
            columns: [{
              field: 'state',
              checkbox: true,
              visible: exportDataType == 'selected',
            }, {
              field: 'name',
-             title: '工作者',
+             title: '名称',
+             sortable: true,
+           },{
+             field: 'times_of_month',
+             title: '总工时',
              sortable: true,
            }, {
-             field: 'number',
-             title: '工号',
+             field: 'times_of_no_schedules',
+             title: '非例行排故',
              sortable: true,
            }, {
-             field: 'date',
-             title: '日期',
+             field: 'times_of_schedules',
+             title: '例行',
              sortable: true,
            }, {
-             field: 'airplane',
-             title: '飞机',
+             field: 'times_of_services',
+             title: '勤务',
              sortable: true,
-             footerFormatter: airplaneFormatter,
            }, {
-             field: 'task',
-             title: '工作名称',
+             field: 'times_of_miscellaneousness',
+             title: '车间杂项',
              sortable: false,
-             footerFormatter: taskFormatter,
            }, {
-             field: 'calculated_time',
-             title: '工时',
-             sortable: true,
-             footerFormatter: calculatedTimeFormatter,
-           }, {
-             field: 'kind',
-             title: '工作类别',
-             sortable: true,
-           }, {
-             field: 'approved',
-             title: '是否审核',
+             field: 'times_of_others',
+             title: '其他',
              sortable: true,
            }]
          });
-       }
-       );
+       });
    }
- };
+ });
 
  $(function () {
    $('#toolbar').find('select').change(function () {
-     var workers = document.getElementById('worker');
      var exportDataType = $(this).val();
+     var teamCategory = document.getElementById('team-category');
+     var month = $('#month').val();
 
-     if (workers.selectedIndex >0  && workers.options.length !== 0) {
-       var selectWorker = workers.options[workers.selectedIndex].value;
+     if (teamCategory.selectedIndex > 0 && teamCategory.options.length !== 0) {
+       var selectTeam = teamCategory.options[teamCategory.selectedIndex].value;
+     }
 
-       post('{{API}}', {number: selectWorker}).
+     if (selectTeam && month) {
+       post('{{API}}', {teamID: selectTeam, yearAndMonth: month}).
          then(function (data) {
+
            var modifiedData = $.each(data, function (index, item) {
              item.state= false;
            });
@@ -279,7 +226,7 @@
            $('#table').bootstrapTable('destroy').bootstrapTable({
              exportDataType: exportDataType,
              exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'pdf'],
-             pageSize: 50,
+             pageSize: 20,
              data: modifiedData,
              columns: [{
                field: 'state',
@@ -287,38 +234,31 @@
                visible: exportDataType == 'selected',
              }, {
                field: 'name',
-               title: '工作者',
+               title: '名称',
+               sortable: true,
+             },{
+               field: 'times_of_month',
+               title: '总工时',
                sortable: true,
              }, {
-               field: 'number',
-               title: '工号',
+               field: 'times_of_no_schedules',
+               title: '非例行排故',
                sortable: true,
              }, {
-               field: 'date',
-               title: '日期',
+               field: 'times_of_schedules',
+               title: '例行',
                sortable: true,
              }, {
-               field: 'airplane',
-               title: '飞机',
+               field: 'times_of_services',
+               title: '勤务',
                sortable: true,
-               footerFormatter: airplaneFormatter,
              }, {
-               field: 'task',
-               title: '工作名称',
+               field: 'times_of_miscellaneousness',
+               title: '车间杂项',
                sortable: false,
-               footerFormatter: taskFormatter,
              }, {
-               field: 'calculated_time',
-               title: '工时',
-               sortable: true,
-               footerFormatter: calculatedTimeFormatter,
-             }, {
-               field: 'kind',
-               title: '工作类别',
-               sortable: true,
-             }, {
-               field: 'approved',
-               title: '是否审核',
+               field: 'times_of_others',
+               title: '其他',
                sortable: true,
              }]
            });
@@ -327,13 +267,6 @@
    }).trigger('change');
  });
 
- $('#filter').click(function () {
-   var from = $('#startDate').val();
-   var to = $('#endDate').val();
-   $('#table').bootstrapTable('filterBy', {
-     date: getDates(from, to)
-   });
- });
 </script>
 
 <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
@@ -351,8 +284,14 @@
      language: 'zh-CN', //语言
      autoclose: true, //选择后自动关闭
      clearBtn: true,//清除按钮
-     format: "yyyy-mm-dd"//日期格式
+     format: 'yyyy-mm',//日期格式
+     startViwe: 'month',
+     minViewMode: 'months'
    });
+ });
+
+ $('#month').datepicker().on('changeMonth', function (e) {
+   resetSelectToExport();
  });
 </script>
 {% endblock tail_js%}

@@ -206,3 +206,11 @@ class ApprovedTimesheetView(BaseView):
         return self.render('admin/model/approved_timesheets_list.html',
                            title=u'已核工时查看',
                            API='/api/approvedTimesheets')
+
+
+class StatisticsTimesheetView(BaseView):
+    @expose('/', methods=['GET', 'POST'])
+    def index_view(self):
+        return self.render('admin/model/statistics_timesheets_list.html',
+                           title=u'班组工时月份统计',
+                           API='/api/statistics')

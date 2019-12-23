@@ -6,6 +6,7 @@ import jieba
 import json
 from datetime import datetime, timedelta, date
 import itertools
+import calendar
 from weixin import WXAPPAPI
 from WXBizDataCrypt import WXBizDataCrypt
 from .models.tool import Tool, Project
@@ -76,6 +77,9 @@ parser.add_argument('openId', type=str, help='openId must be a string.')
 parser.add_argument('teamID', type=str, help='teamID must be a string.')
 parser.add_argument('startDate', type=str, help='startDate must be a string.')
 parser.add_argument('endDate', type=str, help='endDate must be a string.')
+parser.add_argument('yearAndMonth',
+                    type=str,
+                    help='yearAndMonth must be a string.')
 
 
 class ProjectsAPI(Resource):
@@ -419,3 +423,84 @@ class ApprovedTimesheetsAPI(Resource):
             results = Timesheet.query.filter_by(number=number,
                                                 approved=u'是').all()
         return list(results)
+
+
+class StatisticsAPI(Resource):
+    def post(self):
+        args = parser.parse_args()
+
+        teamID = args.get('teamID', None)
+        yearAndMonth = args.get('yearAndMonth', None)
+
+        try:
+            year, month = yearAndMonth.split('-')
+        except AttributeError as e:
+            return api_abort(400, e.args[0], binded=False)
+        try:
+            team_id = int(teamID)
+            year = int(year)
+            month = int(month)
+        except (UnicodeEncodeError, ValueError, TypeError) as e:
+            return api_abort(400, e.args[0], binded=False)
+
+        _, num_days = calendar.monthrange(year, month)
+        days = [date(year, month, day) for day in range(1, num_days)]
+        a_day = timedelta(days=1)
+        workers = Worker.query.filter_by(team_id=team_id).all()
+        results = []
+
+        if workers:
+            for worker in workers:
+                times_of_month = 0
+                times_of_schedules = 0
+                times_of_no_schedules = 0
+                times_of_miscellaneousness = 0
+                times_of_others = 0
+                times_of_services = 0
+                for day in days:
+                    date_unicode = unicode(date.strftime(day, '%Y-%m-%d'),
+                                           'utf-8')
+                    timesheets = Timesheet.query.filter_by(
+                        number=worker.number, date=date_unicode,
+                        approved=u'是').all()
+                    times_of_day = sum(timesheet.calculated_time
+                                       for timesheet in timesheets)
+                    times_of_month += times_of_day
+
+                    schedules = filter(lambda t: t.kind == u'例行', timesheets)
+                    times_of_schedules_of_day = sum(schedule.calculated_time
+                                             for schedule in schedules)
+                    times_of_schedules += times_of_schedules_of_day
+
+                    no_schedules = filter(lambda t: t.kind == u'非例行排故',
+                                          timesheets)
+                    times_of_no_schedules_of_day = sum(
+                        no_schedule.calculated_time
+                        for no_schedule in no_schedules)
+                    times_of_no_schedules += times_of_no_schedules_of_day
+
+                    miscellaneousness_list = filter(
+                        lambda t: t.kind == u'车间杂项', timesheets)
+                    times_of_miscellaneousness_of_day = sum(
+                        miscellaneousness.calculated_time
+                        for miscellaneousness in miscellaneousness_list)
+                    times_of_miscellaneousness += times_of_miscellaneousness_of_day
+
+                    others = filter(lambda t: t.kind == u'其他', timesheets)
+                    times_of_others_of_day = sum(other.calculated_time
+                                          for other in others)
+                    times_of_others += times_of_others_of_day
+
+                    services = filter(lambda t: t.kind == u'勤务', timesheets)
+                    times_of_services_of_day = sum(service.calculated_time for service in services)
+                    times_of_services += times_of_services_of_day
+
+                results.append(
+                    dict(name=worker.name,
+                    times_of_month=times_of_month,
+                    times_of_schedules = times_of_schedules,
+                    times_of_no_schedules = times_of_no_schedules,
+                    times_of_miscellaneousness = times_of_miscellaneousness,
+                    times_of_others = times_of_others,
+                    times_of_services = times_of_services,))
+            return jsonify(results)
