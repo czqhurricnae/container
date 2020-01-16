@@ -1,19 +1,15 @@
 # -*- coding:utf-8 -*-
+from datetime import datetime
 from flask import url_for, flash, redirect, request
-from jieba.analyse import ChineseAnalyzer
 from flask_admin import expose, BaseView
 from flask_admin.contrib.sqla import ModelView
-from flask_admin.contrib.sqla.filters import BaseSQLAFilter, FilterEqual
+from flask_admin.contrib.sqla.filters import FilterEqual
 from flask_admin.model.template import EndpointLinkRowAction
-from flask_admin.helpers import get_redirect_target, flash_errors
-from flask_admin.form import rules
+from flask_admin.helpers import get_redirect_target
 from flask_admin.actions import action
 from sqlalchemy import func
-from flask_babel import gettext
-from datetime import datetime
 from .hierarchy import Team
 from .. import db
-from ..aliyun import OSSFileAdmin
 
 
 class Timesheet(db.Model):

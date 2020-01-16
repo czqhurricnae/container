@@ -1,22 +1,19 @@
 # -*- coding:utf-8 -*-
+import json
+from datetime import datetime
 from flask import url_for, redirect, request, flash
-from jieba.analyse import ChineseAnalyzer
 from flask_admin import expose
 from flask_admin.contrib.sqla import ModelView
-from flask_admin.form import rules
 from flask_admin.actions import action
 from sqlalchemy.exc import IntegrityError
-from datetime import datetime
-import json
 from .. import db
-from ..aliyun import OSSFileAdmin
 
 
 class StandardTime(db.Model):
 
-    __tablename__ = u'standard_time'
+    __tablename__ = 'standard_time'
 
-    __searchable__ = [u'title']
+    __searchable__ = ['title']
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.UnicodeText(64), nullable=False)
@@ -38,14 +35,14 @@ class StandardTime(db.Model):
         self.description = description
 
     def __repr__(self):
-        return u'<StandardTime{0}: {1}>'.format(self.title, self.tasktime)
+        return '<StandardTime {0}: {1}>'.format(self.title, self.tasktime)
 
 
 class StandardTimeModelView(ModelView):
 
     list_template = 'admin/model/CSV_import_list.html'
 
-    edit_modal = True
+    edit_model = True
 
     column_editable_list = ('title', 'tasktime', 'kind')
 

@@ -1,10 +1,6 @@
 # -*- coding:utf-8 -*-
-from flask import url_for
 from .. import db
 from jieba.analyse import ChineseAnalyzer
-from flask_admin.contrib.sqla import ModelView
-from flask_admin.form import rules
-from ..aliyun import OSSFileAdmin
 from datetime import datetime
 
 
