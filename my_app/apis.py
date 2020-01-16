@@ -15,6 +15,7 @@ from .models.standard import StandardTime
 from .models.advise import Advise
 from .models.hierarchy import Team, Worker
 from .models.timesheet import Timesheet
+from .models.chapter import Chapter
 from .errors import api_abort
 from my_app import db
 
@@ -60,8 +61,17 @@ timesheet_resource_fields = {
     'approved': fields.String,
 }
 
+Chapter_resource_fields = {
+    'model': fields.String,
+    'chapter_section_number': fields.String,
+    'english_description': fields.String,
+    'chinese_description': fields.String,
+    'belongto_chapter': fields.String,
+    'chapter_description': fields.String
+}
+
 parser = reqparse.RequestParser()
-parser.add_argument('search')
+parser.add_argument('model')
 parser.add_argument('code', type=str, help='code must be a string.')
 parser.add_argument('session_key',
                     type=str,
@@ -80,6 +90,7 @@ parser.add_argument('endDate', type=str, help='endDate must be a string.')
 parser.add_argument('yearAndMonth',
                     type=str,
                     help='yearAndMonth must be a string.')
+parser.add_argument('model', type=str, help='model must be a string.')
 
 
 class ProjectsAPI(Resource):
@@ -89,13 +100,13 @@ class ProjectsAPI(Resource):
 
     def post(self):
         args = parser.parse_args()
-        search = args.get('search', '')
+        model = args.get('model', '')
         results = []
 
-        seg_list = jieba.cut(sentence=search)
+        seg_list = jieba.cut(sentence=model)
         ars_list = []
         for seg in seg_list:
-            projects = Project.query.whoosh_search(seg, or_=True).all()
+            projects = Project.query.whoosh_model(seg, or_=True).all()
             if len(projects) != 0:
                 ars_list.append(projects)
         try:
@@ -120,11 +131,11 @@ class ProjectsAPI(Resource):
 class SegmentationsAPI(Resource):
     def post(self):
         args = parser.parse_args()
-        search = args.get('search', '')
-        if not (search):
+        model = args.get('model', '')
+        if not (model):
             return []
         else:
-            seg_list = jieba.cut(sentence=search)
+            seg_list = jieba.cut(sentence=model)
             return [seg for seg in seg_list]
 
 
@@ -308,11 +319,11 @@ class DocumentListAPI(Resource):
 
     def post(self):
         args = parser.parse_args()
-        search = args.get('search', '')
-        seg_list = jieba.cut(sentence=search)
+        model = args.get('model', '')
+        seg_list = jieba.cut(sentence=model)
         ars_list = []
         for seg in seg_list:
-            documents = Document.query.whoosh_search(seg, or_=True).all()
+            documents = Document.query.whoosh_model(seg, or_=True).all()
             if len(documents) != 0:
                 ars_list.append(documents)
         try:
@@ -469,7 +480,7 @@ class StatisticsAPI(Resource):
 
                     schedules = filter(lambda t: t.kind == u'例行', timesheets)
                     times_of_schedules_of_day = sum(schedule.calculated_time
-                                             for schedule in schedules)
+                                                    for schedule in schedules)
                     times_of_schedules += times_of_schedules_of_day
 
                     no_schedules = filter(lambda t: t.kind == u'非例行排故',
@@ -488,19 +499,38 @@ class StatisticsAPI(Resource):
 
                     others = filter(lambda t: t.kind == u'其他', timesheets)
                     times_of_others_of_day = sum(other.calculated_time
-                                          for other in others)
+                                                 for other in others)
                     times_of_others += times_of_others_of_day
 
                     services = filter(lambda t: t.kind == u'勤务', timesheets)
-                    times_of_services_of_day = sum(service.calculated_time for service in services)
+                    times_of_services_of_day = sum(service.calculated_time
+                                                   for service in services)
                     times_of_services += times_of_services_of_day
 
                 results.append(
-                    dict(name=worker.name,
-                    times_of_month=times_of_month,
-                    times_of_schedules = times_of_schedules,
-                    times_of_no_schedules = times_of_no_schedules,
-                    times_of_miscellaneousness = times_of_miscellaneousness,
-                    times_of_others = times_of_others,
-                    times_of_services = times_of_services,))
+                    dict(
+                        name=worker.name,
+                        times_of_month=times_of_month,
+                        times_of_schedules=times_of_schedules,
+                        times_of_no_schedules=times_of_no_schedules,
+                        times_of_miscellaneousness=times_of_miscellaneousness,
+                        times_of_others=times_of_others,
+                        times_of_services=times_of_services,
+                    ))
             return jsonify(results)
+
+
+class ChaptersAPI(Resource):
+    @marshal_with(Chapter_resource_fields)
+    def post(self):
+        args = parser.parse_args()
+        model = args.get('model', '')
+
+        try:
+            model = unicode(model, 'utf-8')
+        except (UnicodeEncodeError, ValueError, TypeError) as e:
+            return api_abort(400, e.args[0])
+
+        return [
+            chapter for chapter in Chapter.query.filter_by(model=model).all()
+        ]

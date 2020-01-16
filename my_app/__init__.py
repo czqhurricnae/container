@@ -65,7 +65,8 @@ def create_app():
     from .models.hierarchy import Department, Workshop, Team, Worker, DepartmentModelView, WorkshopModelView, TeamModelView, WorkerModelView
     from .models.standard import StandardTime, StandardTimeModelView
     from .models.timesheet import Timesheet, TimesheetModelView, PendingApprovedModelView, ApprovedTimesheetView, StatisticsTimesheetView
-    from apis import ProjectsAPI, SegmentationsAPI, ToolsAPI, Code2sessionAPI, UserInfoAPI, UpdateUserInfoAPI, DocumentListAPI, DocumentAPI, TasksAPI, TeamsAPI, ApprovedTimesheetsAPI, StatisticsAPI
+    from .models.chapter import Chapter, ChapterModelView
+    from apis import ProjectsAPI, SegmentationsAPI, ToolsAPI, Code2sessionAPI, UserInfoAPI, UpdateUserInfoAPI, DocumentListAPI, DocumentAPI, TasksAPI, TeamsAPI, ApprovedTimesheetsAPI, StatisticsAPI, ChaptersAPI
 
     app = Flask(__name__,
                 instance_path=INSTANCE_PATH,
@@ -161,6 +162,8 @@ def create_app():
                      bucket_name='filessystem',
                      endpoint='http://oss-cn-shanghai.aliyuncs.com',
                      name=u'阿里云存储'))
+    admin.add_view(
+        ChapterModelView(model=Chapter, session=db.session, name=u'章节号清单'))
 
     babel.init_app(app)
 
@@ -187,6 +190,7 @@ def create_app():
     api.add_resource(TeamsAPI, '/api/teams')
     api.add_resource(ApprovedTimesheetsAPI, '/api/approvedTimesheets')
     api.add_resource(StatisticsAPI, '/api/statistics')
+    api.add_resource(ChaptersAPI, '/api/chapters')
     return app
 
 
