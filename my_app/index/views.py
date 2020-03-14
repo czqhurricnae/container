@@ -12,7 +12,7 @@ from my_app.errors import api_abort
 @index.route('/', methods=['GET', 'POST'])
 def hello():
     if request.is_xhr:
-        from ..models import Project, Tool
+        from ..models.tool import Project, Tool
 
         search = request.args.get('search', '')
         seg_list = jieba.cut(sentence=search)
