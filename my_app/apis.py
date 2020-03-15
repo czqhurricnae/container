@@ -71,6 +71,8 @@ Chapter_resource_fields = {
 }
 
 parser = reqparse.RequestParser()
+parser.add_argument('search')
+# XXX: 章节号查询使用.
 parser.add_argument('model')
 parser.add_argument('code', type=str, help='code must be a string.')
 parser.add_argument('session_key',
@@ -100,13 +102,13 @@ class ProjectsAPI(Resource):
 
     def post(self):
         args = parser.parse_args()
-        model = args.get('model', '')
+        search = args.get('search', '')
         results = []
 
-        seg_list = jieba.cut(sentence=model)
+        seg_list = jieba.cut(sentence=search)
         ars_list = []
         for seg in seg_list:
-            projects = Project.query.whoosh_model(seg, or_=True).all()
+            projects = Project.query.whoosh_search(seg, or_=True).all()
             if len(projects) != 0:
                 ars_list.append(projects)
         try:
@@ -131,11 +133,11 @@ class ProjectsAPI(Resource):
 class SegmentationsAPI(Resource):
     def post(self):
         args = parser.parse_args()
-        model = args.get('model', '')
-        if not (model):
+        search = args.get('search', '')
+        if not (search):
             return []
         else:
-            seg_list = jieba.cut(sentence=model)
+            seg_list = jieba.cut(sentence=search)
             return [seg for seg in seg_list]
 
 
@@ -319,11 +321,11 @@ class DocumentListAPI(Resource):
 
     def post(self):
         args = parser.parse_args()
-        model = args.get('model', '')
-        seg_list = jieba.cut(sentence=model)
+        search = args.get('search', '')
+        seg_list = jieba.cut(sentence=search)
         ars_list = []
         for seg in seg_list:
-            documents = Document.query.whoosh_model(seg, or_=True).all()
+            documents = Document.query.whoosh_search(seg, or_=True).all()
             if len(documents) != 0:
                 ars_list.append(documents)
         try:
